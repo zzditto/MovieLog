@@ -578,31 +578,29 @@
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 420px) {
-    .movielog-poster-card {
-        flex-direction: column;
-        width: 210px;
-        margin: 0 auto;
-    }
-    .movielog-poster-card-img {
-        width: 140px;
-        min-height: 190px;
-        margin: 0 auto 16px;
-    }
-    .movielog-poster-card-meta-grid {
-        grid-template-columns: repeat(2, auto);
-    }
-    .movielog-poster-card-right {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        margin-left: 0;
-        margin-top: 12px;
-        padding-left: 0;
-        border-left: none;
-        border-top: 2px dashed rgba(0, 0, 0, 0.1);
-        padding-top: 12px;
-    }
+.movielog-vertical-layout .movielog-poster-card {
+    flex-direction: column;
+    width: 210px;
+    margin: 0 auto;
+}
+.movielog-vertical-layout .movielog-poster-card-img {
+    width: 140px;
+    min-height: 190px;
+    margin: 0 auto 16px;
+}
+.movielog-vertical-layout .movielog-poster-card-meta-grid {
+    grid-template-columns: repeat(2, auto);
+}
+.movielog-vertical-layout .movielog-poster-card-right {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 0;
+    margin-top: 12px;
+    padding-left: 0;
+    border-left: none;
+    border-top: 2px dashed rgba(0, 0, 0, 0.1);
+    padding-top: 12px;
 }
 
 /* ===== Settings ===== */

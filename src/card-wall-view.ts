@@ -29,6 +29,8 @@ const COLOR_THEMES = ['pink', 'blue', 'green', 'peach'];
 
 export class MovieLogView extends ItemView {
     private settings: PluginSettings;
+    private resizeObserver: ResizeObserver | null = null;
+    private static readonly BREAKPOINT = 420;
 
     constructor(leaf: WorkspaceLeaf, settings: PluginSettings) {
         super(leaf);
@@ -53,9 +55,11 @@ export class MovieLogView extends ItemView {
         container.empty();
 
         await this.renderCards(container);
+        this.setupResizeObserver(container);
     }
 
     async onClose(): Promise<void> {
+        this.cleanupResizeObserver();
     }
 
     async refreshCards(): Promise<void> {
@@ -299,5 +303,26 @@ export class MovieLogView extends ItemView {
         const halfStar = (rating / 2) - fullStars >= 0.5;
         const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
         return '★'.repeat(fullStars) + (halfStar ? '☆' : '') + '☆'.repeat(emptyStars);
+    }
+
+    private setupResizeObserver(container: HTMLElement): void {
+        this.cleanupResizeObserver();
+
+        this.resizeObserver = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const width = entry.contentRect.width;
+                const isVertical = width < MovieLogView.BREAKPOINT;
+                container.classList.toggle('movielog-vertical-layout', isVertical);
+            }
+        });
+
+        this.resizeObserver.observe(container);
+    }
+
+    private cleanupResizeObserver(): void {
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+            this.resizeObserver = null;
+        }
     }
 }
