@@ -1,5 +1,11 @@
 /* MovieLog Plugin Styles */
 
+:root {
+  --poster-width: 140px;
+  --card-width-vertical: calc(var(--poster-width) * 1.5);
+  --breakpoint: calc(var(--poster-width) * 3);
+}
+
 /* ===== Search Modal ===== */
 .movielog-search-input {
     display: flex;
