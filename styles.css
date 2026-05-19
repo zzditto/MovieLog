@@ -578,7 +578,7 @@
 }
 
 /* ===== Responsive ===== */
-@media (max-width: var(--breakpoint)) {
+@media (max-width: 580px) {
     .movielog-poster-card {
         flex-direction: column;
     }
