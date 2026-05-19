@@ -1,0 +1,604 @@
+/* MovieLog Plugin Styles */
+
+/* ===== Search Modal ===== */
+.movielog-search-input {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.movielog-search-field {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    background: var(--background-primary);
+    color: var(--text-normal);
+    font-size: 14px;
+}
+
+.movielog-search-field:focus {
+    border-color: var(--interactive-accent);
+    outline: none;
+}
+
+.movielog-search-btn {
+    padding: 8px 16px;
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.movielog-search-btn:hover {
+    background: var(--interactive-accent-hover);
+}
+
+.movielog-search-status,
+.movielog-search-error {
+    padding: 12px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.movielog-search-error {
+    color: var(--text-error);
+}
+
+.movielog-search-results {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.movielog-search-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.movielog-search-item:hover {
+    background: var(--background-modifier-hover);
+}
+
+.movielog-search-poster {
+    width: 60px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.movielog-search-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: center;
+}
+
+.movielog-search-info strong {
+    color: var(--text-normal);
+    font-size: 14px;
+}
+
+.movielog-search-info span {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+/* ===== Season Modal ===== */
+.movielog-season-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.movielog-season-item {
+    display: flex;
+    padding: 12px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.movielog-season-item:hover {
+    background: var(--background-modifier-hover);
+}
+
+.movielog-season-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.movielog-season-info strong {
+    color: var(--text-normal);
+    font-size: 14px;
+}
+
+.movielog-season-info span {
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+/* ===== Raw Data Card (Reading Mode) ===== */
+.movielog-raw-card {
+    background: var(--background-secondary, #fff);
+    border-radius: 16px;
+    padding: 28px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.movielog-raw-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.movielog-raw-icon {
+    font-size: 18px;
+}
+
+.movielog-raw-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-normal, #3d3229);
+}
+
+.movielog-raw-link {
+    color: var(--text-accent, #c4896e);
+    font-size: 14px;
+    text-decoration: none;
+    margin-left: 4px;
+}
+
+.movielog-raw-link:hover {
+    text-decoration: underline;
+}
+
+.movielog-raw-poster {
+    width: 160px;
+    height: 220px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    background: var(--background-modifier-border, linear-gradient(135deg, #f5e6d8, #e8d5c4));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted, #bfa898);
+    font-size: 14px;
+}
+
+.movielog-raw-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.movielog-raw-section {
+    margin-bottom: 18px;
+}
+
+.movielog-raw-section-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1.5px solid var(--background-modifier-border, #f0e4da);
+}
+
+.movielog-raw-section-icon {
+    font-size: 15px;
+}
+
+.movielog-raw-section-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted, #8b6e5a);
+}
+
+.movielog-raw-info-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.movielog-raw-info-list li {
+    font-size: 14px;
+    color: var(--text-normal, #5a4a3e);
+    margin-bottom: 5px;
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.8;
+}
+
+.movielog-raw-info-list li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--text-muted, #c9b5a6);
+}
+
+.movielog-raw-label {
+    color: var(--text-muted, #9a8577);
+}
+
+.movielog-raw-star {
+    color: #e8a849;
+}
+
+.movielog-raw-highlight {
+    color: var(--text-accent, #c4896e);
+    font-weight: 600;
+}
+
+/* ===== Poster Wall ===== */
+.movielog-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.movielog-empty-state p {
+    margin: 4px 0;
+}
+
+.movielog-poster-header {
+    padding: 16px 16px 0;
+    margin-bottom: 24px;
+}
+
+.movielog-stats-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-normal);
+    margin-bottom: 8px;
+}
+
+.movielog-stats-sub {
+    font-size: 15px;
+    color: var(--text-muted);
+}
+
+.movielog-poster-wall {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: 0 16px 16px;
+}
+
+.movielog-poster-card {
+    display: flex;
+    border-radius: 16px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+    min-height: 240px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.movielog-poster-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.movielog-poster-card.pink { background: #fce4ec; }
+.movielog-poster-card.blue { background: #e3f2fd; }
+.movielog-poster-card.green { background: #e8f5e9; }
+.movielog-poster-card.peach { background: #fbe9e7; }
+
+.movielog-poster-card-img {
+    width: 140px;
+    min-height: 190px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+    margin-right: 20px;
+    background: rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9a8577;
+    font-size: 13px;
+}
+
+.movielog-poster-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.movielog-poster-card-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.movielog-poster-card-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.movielog-poster-card-title {
+    font-size: 21px;
+    font-weight: 700;
+    color: #3d3229;
+    line-height: 1.3;
+}
+
+.movielog-poster-card-tmdb-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 6px;
+    background: #0d253f;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    flex-shrink: 0;
+}
+
+.movielog-poster-card-tmdb-btn:hover {
+    background: #1a3a5c;
+    color: #fff;
+}
+
+
+.movielog-poster-card-tags {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+
+.movielog-poster-card-tag {
+    padding: 3px 12px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 500;
+    background: rgba(0, 0, 0, 0.05);
+    color: #6b5548;
+}
+
+.movielog-poster-card-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    gap: 10px 16px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+.movielog-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+}
+
+.movielog-meta-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.movielog-meta-value {
+    font-weight: 500;
+    color: #3d3229;
+    white-space: nowrap;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.movielog-poster-card-overview {
+    font-size: 14px;
+    color: #9a8577;
+    line-height: 1.5;
+    overflow: hidden;
+    flex: 1;
+}
+
+.movielog-poster-card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    min-width: 90px;
+    margin-left: 16px;
+    padding-left: 16px;
+    border-left: 2px dashed rgba(0, 0, 0, 0.1);
+}
+
+.movielog-poster-card-year {
+    font-size: 28px;
+    font-weight: 700;
+    color: #3d3229;
+}
+
+.movielog-poster-card-date {
+    font-size: 13px;
+    color: #9a8577;
+    text-align: right;
+}
+
+.movielog-poster-card-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.movielog-poster-stars {
+    font-size: 20px;
+    color: #e8a849;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+}
+
+.movielog-poster-score {
+    font-size: 26px;
+    font-weight: 700;
+    color: #3d3229;
+}
+
+.movielog-score-main {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.movielog-score-unit {
+    font-size: 13px;
+    font-weight: 400;
+    color: #9a8577;
+}
+
+/* ===== Legacy Card Wall (kept for compatibility) ===== */
+.movielog-card-wall {
+    display: grid;
+    gap: 16px;
+    padding: 16px;
+}
+
+.movielog-card-small {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+}
+
+.movielog-card-medium {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+
+.movielog-card-large {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.movielog-card {
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.movielog-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.movielog-card-poster {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    display: block;
+}
+
+.movielog-card-info {
+    padding: 10px 12px;
+}
+
+.movielog-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-normal);
+    margin-bottom: 6px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.movielog-card-meta {
+    display: flex;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.movielog-card-rating {
+    color: var(--text-accent);
+}
+
+.movielog-card-personal {
+    color: var(--text-muted);
+}
+
+.movielog-card-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.movielog-status-planned {
+    background: var(--background-modifier-border);
+    color: var(--text-muted);
+}
+
+.movielog-status-watching {
+    background: var(--color-blue);
+    color: white;
+}
+
+.movielog-status-completed {
+    background: var(--color-green);
+    color: white;
+}
+
+.movielog-status-dropped {
+    background: var(--color-red);
+    color: white;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 580px) {
+    .movielog-poster-card {
+        flex-direction: column;
+    }
+    .movielog-poster-card-img {
+        width: 100%;
+        min-height: 200px;
+        margin-right: 0;
+        margin-bottom: 16px;
+    }
+    .movielog-poster-card-meta-grid {
+        grid-template-columns: repeat(2, auto);
+    }
+    .movielog-poster-card-right {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        margin-left: 0;
+        margin-top: 12px;
+        padding-left: 0;
+        border-left: none;
+        border-top: 2px dashed rgba(0, 0, 0, 0.1);
+        padding-top: 12px;
+    }
+}
+
+/* ===== Settings ===== */
+.setting-item-info .setting-item-description {
+    font-size: 12px;
+}
