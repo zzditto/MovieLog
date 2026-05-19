@@ -2,7 +2,7 @@
 
 :root {
   --poster-width: 140px;
-  --card-width-vertical: calc(var(--poster-width) * 1.5);
+  --card-width-vertical: calc(var(--poster-width) * 3);
   --breakpoint: calc(var(--poster-width) * 3);
 }
 
@@ -580,13 +580,12 @@
 /* ===== Responsive ===== */
 .movielog-vertical-layout .movielog-poster-card {
     flex-direction: column;
-    width: 210px;
-    margin: 0 auto;
 }
 .movielog-vertical-layout .movielog-poster-card-img {
-    width: 140px;
-    min-height: 190px;
-    margin: 0 auto 16px;
+    width: 100%;
+    min-height: 200px;
+    margin-right: 0;
+    margin-bottom: 16px;
 }
 .movielog-vertical-layout .movielog-poster-card-meta-grid {
     grid-template-columns: repeat(2, auto);

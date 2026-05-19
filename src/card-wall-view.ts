@@ -30,7 +30,7 @@ const COLOR_THEMES = ['pink', 'blue', 'green', 'peach'];
 export class MovieLogView extends ItemView {
     private settings: PluginSettings;
     private resizeObserver: ResizeObserver | null = null;
-    private static readonly BREAKPOINT = 420;
+    private static readonly BREAKPOINT = 580;
 
     constructor(leaf: WorkspaceLeaf, settings: PluginSettings) {
         super(leaf);
