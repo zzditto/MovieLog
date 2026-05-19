@@ -578,15 +578,16 @@
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 580px) {
+@media (max-width: 420px) {
     .movielog-poster-card {
         flex-direction: column;
+        width: 210px;
+        margin: 0 auto;
     }
     .movielog-poster-card-img {
-        width: 100%;
-        min-height: 200px;
-        margin-right: 0;
-        margin-bottom: 16px;
+        width: 140px;
+        min-height: 190px;
+        margin: 0 auto 16px;
     }
     .movielog-poster-card-meta-grid {
         grid-template-columns: repeat(2, auto);
