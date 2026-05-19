@@ -1,91 +1,93 @@
 # MovieLog
 
-一个 Obsidian 插件，用于记录你的电影和电视剧观影历史。通过 TMDB API 获取影视剧信息，生成结构化的观影记录，并以卡片墙形式展示。
+An Obsidian plugin for tracking your movie and TV series watching history. Fetches media information via TMDB API, generates structured watch records, and displays them in a card wall view.
 
-## 功能特性
+[中文版本请参阅 README_zh.md](README_zh.md)
 
-- **TMDB 搜索**：通过命令面板搜索电影和电视剧，自动获取元数据
-- **模板化记录**：自动生成包含海报、评分、简介等信息的 Markdown 文件
-- **剧集支持**：支持按季记录电视剧，包含集数列表和观看进度
-- **卡片墙视图**：以可视化卡片网格浏览所有观影记录
-- **个人字段**：可填写观后感、个人评分、观看平台、观看状态等
+## Features
 
-## 预览
+- **TMDB Search**: Search movies and TV series via command palette, automatically fetch metadata
+- **Templated Records**: Auto-generate Markdown files with posters, ratings, synopsis, etc.
+- **Series Support**: Track TV series by season, including episode lists and watch progress
+- **Card Wall View**: Browse all watch records in a visual card grid
+- **Personal Fields**: Fill in your thoughts, personal rating, watch platform, watch status, etc.
 
-![预览](image.png)
+## Preview
 
-## 安装
+![Preview](image.png)
 
-### 方法 1：从 Obsidian 插件市场安装（推荐）
+## Installation
 
-1. 打开 Obsidian → 设置 → 第三方插件 → 浏览
-2. 搜索 "MovieLog"
-3. 点击安装并启用
+### Method 1: Install from Obsidian Community Plugins (Recommended)
 
-### 方法 2：手动安装
+1. Open Obsidian → Settings → Community Plugins → Browse
+2. Search for "MovieLog"
+3. Click Install and Enable
 
-1. 从 [Releases](https://github.com/YOUR_USERNAME/movielog/releases) 下载最新版本的 `main.js`、`manifest.json`、`styles.css`
-2. 在你的 Obsidian 库中创建插件目录：
+### Method 2: Manual Installation
+
+1. Download the latest `main.js`, `manifest.json`, `styles.css` from [Releases](https://github.com/zzditto/MovieLog/releases)
+2. Create the plugin directory in your Obsidian vault:
    ```
-   {你的库}/.obsidian/plugins/movielog/
+   {your vault}/.obsidian/plugins/movielog/
    ```
-3. 将下载的三个文件复制到该目录
-4. 打开 Obsidian → 设置 → 第三方插件 → 启用 MovieLog
+3. Copy the three downloaded files into that directory
+4. Open Obsidian → Settings → Community Plugins → Enable MovieLog
 
-### 方法 3：从源码构建
+### Method 3: Build from Source
 
 ```bash
-# 克隆仓库
-git clone https://github.com/YOUR_USERNAME/movielog.git
+# Clone the repository
+git clone https://github.com/zzditto/MovieLog.git
 cd movielog
 
-# 安装依赖
+# Install dependencies
 npm install
 
-# 构建
+# Build
 npm run build
 
-# 复制到你的 Obsidian 库
+# Copy to your Obsidian vault
 cp main.js manifest.json styles.css /path/to/your/vault/.obsidian/plugins/movielog/
 ```
 
-## 配置
+## Configuration
 
-1. 打开 Obsidian → 设置 → 第三方插件 → MovieLog
-2. 输入你的 TMDB API Key：
-   - 前往 [themoviedb.org](https://www.themoviedb.org/signup) 注册账号
-   - 在 [API 设置](https://www.themoviedb.org/settings/api) 获取 API Key
-3. 配置其他选项：
-   - **默认保存文件夹**：观影记录保存的目录（默认：`MovieLog`）
-   - **TMDB 语言**：元数据语言（默认：简体中文）
-   - **卡片大小**：卡片墙中卡片的显示大小
-   - **排序方式**：按观看日期、标题、评分或上映日期排序
+1. Open Obsidian → Settings → Community Plugins → MovieLog
+2. Enter your TMDB API Key:
+   - Sign up at [themoviedb.org](https://www.themoviedb.org/signup)
+   - Get your API Key from [API Settings](https://www.themoviedb.org/settings/api)
+3. Configure other options:
+   - **Default Save Folder**: Directory for watch records (default: `MovieLog`)
+   - **TMDB Language**: Metadata language (default: Simplified Chinese)
+   - **Card Size**: Display size of cards in the card wall
+   - **Sort By**: Sort by watch date, title, rating, or release date
 
-## 使用方法
+## Usage
 
-### 添加电影记录
+### Add Movie Record
 
-1. 按 `Ctrl+P`（macOS 为 `Cmd+P`）打开命令面板
-2. 输入 `MovieLog: 添加电影记录`
-3. 输入电影名称并搜索
-4. 从结果列表中选择电影
-5. 自动生成包含完整信息的 Markdown 文件
-6. 填写你的观后感、评分等个人字段
+1. Press `Ctrl+P` (`Cmd+P` on macOS) to open the command palette
+2. Type `MovieLog: Add Movie Record`
+3. Enter the movie name and search
+4. Select the movie from the result list
+5. A Markdown file with complete information is auto-generated
+6. Fill in your thoughts, rating, and other personal fields
 
-### 添加剧集记录
+### Add TV Series Record
 
-1. 打开命令面板，输入 `MovieLog: 添加剧集记录`
-2. 搜索电视剧名称
-3. 选择剧集后，选择要记录的季
-4. 自动生成包含剧集信息和集数列表的文件
-5. 更新观看进度和观后感
+1. Open the command palette, type `MovieLog: Add TV Series Record`
+2. Search for the TV series name
+3. After selecting the series, choose the season to record
+4. A file with series information and episode list is auto-generated
+5. Update watch progress and your thoughts
 
-### 查看卡片墙
+### View Card Wall
 
-1. 点击左侧边栏的电影图标
-2. 或使用命令面板输入 `MovieLog: 打开卡片墙`
-3. 浏览所有观影记录，点击卡片跳转到对应文件
+1. Click the movie icon in the left sidebar
+2. Or use the command palette and type `MovieLog: Open Card Wall`
+3. Browse all watch records, click a card to jump to the corresponding file
 
-## 许可证
+## License
 
 MIT License

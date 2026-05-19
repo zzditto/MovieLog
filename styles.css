@@ -130,7 +130,7 @@
 
 /* ===== Raw Data Card (Reading Mode) ===== */
 .movielog-raw-card {
-    background: var(--background-secondary, #fff);
+    background: var(--background-secondary, #ffffff);
     border-radius: 16px;
     padding: 28px 24px;
     margin-bottom: 24px;
@@ -349,7 +349,7 @@
     align-items: center;
     padding: 1px 6px;
     background: #0d253f;
-    color: #fff;
+    color: #ffffff;
     border-radius: 4px;
     font-size: 10px;
     font-weight: 500;
@@ -361,7 +361,7 @@
 
 .movielog-poster-card-tmdb-btn:hover {
     background: #1a3a5c;
-    color: #fff;
+    color: #ffffff;
 }
 
 
