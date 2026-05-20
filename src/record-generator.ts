@@ -1,6 +1,7 @@
 import { App, TFile } from 'obsidian';
 import { TMDBMovieDetails, TMDBTVShowDetails, TMDBSeasonDetails, PluginSettings } from './types';
 import { buildPosterUrl } from './tmdb-api';
+import { sortMarkdownRecords } from './sort-records';
 
 export interface UserRecordInput {
     year?: string;
@@ -164,7 +165,9 @@ ${content}
         newContent = updatedContent + '\n\n' + content;
     }
 
-    await app.vault.modify(file, newContent);
+    const sortedContent = sortMarkdownRecords(newContent);
+
+    await app.vault.modify(file, sortedContent);
     return file;
 }
 
