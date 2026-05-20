@@ -69,7 +69,7 @@ function rebuildMarkdown(parsed: ParsedMarkdown): string {
 	if (parsed.records.length > 0) {
 		const recordsContent = parsed.records
 			.map(record => record.content)
-			.join('\n\n---\n\n');
+			.join('\n\n');
 		parts.push(recordsContent);
 	}
 
