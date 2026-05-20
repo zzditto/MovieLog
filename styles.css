@@ -321,6 +321,7 @@
     justify-content: center;
     color: #9a8577;
     font-size: 13px;
+    transition: width 0.3s ease, margin 0.3s ease, min-height 0.3s ease;
 }
 
 .movielog-poster-card-img img {
@@ -433,6 +434,7 @@
     margin-left: 16px;
     padding-left: 16px;
     border-left: 2px dashed rgba(0, 0, 0, 0.1);
+    transition: margin 0.3s ease, padding 0.3s ease;
 }
 
 .movielog-poster-card-year {
