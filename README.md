@@ -2,7 +2,7 @@
 
 An Obsidian plugin for tracking your movie and TV series watching history. Fetches media information via TMDB API, generates structured watch records, and displays them in a card wall view.
 
-[中文版本请参阅 README_zh.md](README_zh.md)
+[中文版本请参阅 README_zh.md](https://github.com/zzditto/MovieLog/blob/main/README_zh.md)
 
 ## Features
 

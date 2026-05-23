@@ -2,7 +2,7 @@
 
 一个 Obsidian 插件，用于记录你的电影和电视剧观影历史。通过 TMDB API 获取影视剧信息，生成结构化的观影记录，并以卡片墙形式展示。
 
-[English version see README.md](README.md)
+[English version see README.md](https://github.com/zzditto/MovieLog/blob/main/README.md)
 
 ## 功能特性
 
