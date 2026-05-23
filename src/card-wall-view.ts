@@ -256,7 +256,7 @@ export class MovieLogView extends ItemView {
         const metaGrid = info.createDiv({ cls: 'movielog-poster-card-meta-grid' });
 
         const typeItem = metaGrid.createDiv({ cls: 'movielog-meta-item' });
-        typeItem.createSpan({ cls: 'movielog-meta-icon', text: '🎬' });
+        typeItem.createSpan({ cls: 'movielog-meta-icon', text: record.type === 'movie' ? '🎬' : '📺' });
         typeItem.createSpan({ cls: 'movielog-meta-value', text: record.type === 'movie' ? '电影' : '电视剧' });
 
         const dateItem = metaGrid.createDiv({ cls: 'movielog-meta-item' });
