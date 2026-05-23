@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
 import MovieLogPlugin from './main';
-import { SortBy } from './types';
+import { SortBy, SubHeadingStyle } from './types';
 
 export class MovieLogSettingTab extends PluginSettingTab {
     plugin: MovieLogPlugin;
@@ -82,6 +82,18 @@ export class MovieLogSettingTab extends PluginSettingTab {
                 .setValue(this.plugin.settings.sortBy)
                 .onChange(async (value) => {
                     this.plugin.settings.sortBy = value as SortBy;
+                    await this.plugin.saveSettings();
+                }));
+
+        new Setting(containerEl)
+            .setName('子标题样式')
+            .setDesc('记录中各区块标题的显示格式（两种格式均可正常解析）')
+            .addDropdown(dropdown => dropdown
+                .addOption(SubHeadingStyle.BOLD, '**加粗格式**')
+                .addOption(SubHeadingStyle.HEADING, '### 标题格式')
+                .setValue(this.plugin.settings.subHeadingStyle)
+                .onChange(async (value) => {
+                    this.plugin.settings.subHeadingStyle = value as SubHeadingStyle;
                     await this.plugin.saveSettings();
                 }));
     }

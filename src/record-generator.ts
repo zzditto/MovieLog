@@ -1,5 +1,5 @@
 import { App, TFile } from 'obsidian';
-import { TMDBMovieDetails, TMDBTVShowDetails, TMDBSeasonDetails, PluginSettings } from './types';
+import { TMDBMovieDetails, TMDBTVShowDetails, TMDBSeasonDetails, PluginSettings, SubHeadingStyle } from './types';
 import { buildPosterUrl } from './tmdb-api';
 import { sortMarkdownRecords } from './sort-records';
 
@@ -30,9 +30,11 @@ export function generateMovieRecord(
         'dropped': '已弃剧'
     };
 
+    const h = (title: string) => settings.subHeadingStyle === SubHeadingStyle.BOLD ? `**${title}**` : `### ${title}`;
+
     return `## ${movie.title}
 
-### 电影信息
+${h('电影信息')}
 
 ![宣传海报|350](${posterUrl})
 - **类型**: ${genres.join('、') || '未知'}
@@ -43,7 +45,7 @@ export function generateMovieRecord(
 - **上映日期**: ${movie.release_date || '未知'}
 - **剧情简介**: ${movie.overview || '暂无简介'}
 
-### 我的观看记录
+${h('我的观看记录')}
 
 - **记录日期**: ${today}
 - **完成日期**: ${status === 'completed' ? watchDate : ''}
@@ -51,7 +53,7 @@ export function generateMovieRecord(
 - **观看平台**: ${userInput?.platform || ''}
 - **观看状态**: ${statusText[status] || '已看完'}
 
-### 观后感
+${h('观后感')}
 
 （请在此处填写你的观后感）
 
@@ -85,9 +87,11 @@ export function generateTVRecord(
         'dropped': '已弃剧'
     };
 
+    const h = (title: string) => settings.subHeadingStyle === SubHeadingStyle.BOLD ? `**${title}**` : `### ${title}`;
+
     return `## ${show.name} - ${season.name}
 
-### 本季信息
+${h('本季信息')}
 
 ![宣传海报|350](${posterUrl})
 - **类型**: ${genres.join('、') || '未知'}
@@ -100,7 +104,7 @@ export function generateTVRecord(
 - **播出年份**: ${year || '未知'}
 - **本季简介**: ${season.overview || show.overview || '暂无简介'}
 
-### 我的观看记录
+${h('我的观看记录')}
 
 - **记录日期**: ${today}
 - **完成日期**: ${status === 'completed' ? watchDate : ''}
@@ -109,7 +113,7 @@ export function generateTVRecord(
 - **观看平台**: ${userInput?.platform || ''}
 - **观看状态**: ${statusText[status] || '已看完'}
 
-### 本季观感
+${h('本季观感')}
 
 （请在此处填写你的观后感）
 

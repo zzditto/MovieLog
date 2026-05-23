@@ -48,6 +48,7 @@ export interface PluginSettings {
     tmdbLanguage: string;
     defaultSaveFolder: string;
     sortBy: SortBy;
+    subHeadingStyle: SubHeadingStyle;
 }
 
 export enum WatchStatus {
@@ -62,6 +63,11 @@ export enum SortBy {
     TITLE = 'title',
     RATING = 'rating',
     RELEASE_DATE = 'release_date'
+}
+
+export enum SubHeadingStyle {
+    HEADING = 'heading',
+    BOLD = 'bold'
 }
 
 export interface TMDBSearchResult {
@@ -133,5 +139,6 @@ export const DEFAULT_SETTINGS: PluginSettings = {
     tmdbApiKey: '',
     tmdbLanguage: 'zh-CN',
     defaultSaveFolder: 'MovieLog',
-    sortBy: SortBy.WATCH_DATE
+    sortBy: SortBy.WATCH_DATE,
+    subHeadingStyle: SubHeadingStyle.BOLD
 };

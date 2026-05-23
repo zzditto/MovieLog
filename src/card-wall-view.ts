@@ -127,7 +127,7 @@ export class MovieLogView extends ItemView {
 
         while ((match = recordRegex.exec(content)) !== null) {
             const title = match[1] || '';
-            const block = match[2] || '';
+            const block = normalizeSectionHeaders(match[2] || '');
 
             const infoSectionMatch = block.match(/### (电影信息|本季信息)\n\n([\s\S]*?)(?=\n### |$)/);
             if (!infoSectionMatch) continue;
@@ -325,4 +325,11 @@ export class MovieLogView extends ItemView {
             this.resizeObserver = null;
         }
     }
+}
+
+function normalizeSectionHeaders(block: string): string {
+    return block.replace(
+        /^\*\*(电影信息|本季信息|我的观看记录|观后感|本季观感)\*\*$/gm,
+        '### $1'
+    );
 }

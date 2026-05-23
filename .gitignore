@@ -28,3 +28,4 @@ specs/
 tmp/
 docs/
 .superpowers/
+.qoder/
