@@ -62,6 +62,7 @@ cp main.js manifest.json styles.css /path/to/your/vault/.obsidian/plugins/moviel
    - **TMDB 语言**：元数据语言（默认：简体中文）
    - **卡片大小**：卡片墙中卡片的显示大小
    - **排序方式**：按观看日期、标题、评分或上映日期排序
+   - **子标题样式**：记录中各区块标题的显示格式，可选 `> **引用加粗格式**`（默认）或 `### 标题格式`
 
 ## 使用方法
 

@@ -62,6 +62,7 @@ cp main.js manifest.json styles.css /path/to/your/vault/.obsidian/plugins/moviel
    - **TMDB Language**: Metadata language (default: Simplified Chinese)
    - **Card Size**: Display size of cards in the card wall
    - **Sort By**: Sort by watch date, title, rating, or release date
+   - **Sub-Heading Style**: Display format for section headings in records — either `> **bold blockquote**` (default) or `### heading`
 
 ## Usage
 
