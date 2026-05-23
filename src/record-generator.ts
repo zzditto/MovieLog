@@ -37,6 +37,7 @@ export function generateMovieRecord(
 ${h('电影信息')}
 
 ![宣传海报|350](${posterUrl})
+
 - **类型**: ${genres.join('、') || '未知'}
 - **TMDB ID**: ${movie.id}
 - **TMDB链接**: ${tmdbLink}
@@ -94,6 +95,7 @@ export function generateTVRecord(
 ${h('本季信息')}
 
 ![宣传海报|350](${posterUrl})
+
 - **类型**: ${genres.join('、') || '未知'}
 - **TMDB ID**: ${show.id}
 - **TMDB链接**: ${tmdbLink}
