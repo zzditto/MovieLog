@@ -126,7 +126,8 @@ export class MovieLogView extends ItemView {
         let match;
 
         while ((match = recordRegex.exec(content)) !== null) {
-            const title = match[1] || '';
+            const rawTitle = match[1] || '';
+            const title = rawTitle.replace(/^[🎬📺]\s*/u, '');
             const block = normalizeSectionHeaders(match[2] || '');
 
             const infoSectionMatch = block.match(/### (电影信息|本季信息)\n\n([\s\S]*?)(?=\n### |$)/);

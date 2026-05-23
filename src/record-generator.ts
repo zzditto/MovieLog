@@ -32,7 +32,7 @@ export function generateMovieRecord(
 
     const h = (title: string) => settings.subHeadingStyle === SubHeadingStyle.BOLD ? `**${title}**` : `### ${title}`;
 
-    return `## ${movie.title}
+    return `## 🎬 ${movie.title}
 
 ${h('电影信息')}
 
@@ -90,7 +90,7 @@ export function generateTVRecord(
 
     const h = (title: string) => settings.subHeadingStyle === SubHeadingStyle.BOLD ? `**${title}**` : `### ${title}`;
 
-    return `## ${show.name} - ${season.name}
+    return `## 📺 ${show.name} - ${season.name}
 
 ${h('本季信息')}
 
