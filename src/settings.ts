@@ -87,9 +87,9 @@ export class MovieLogSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName('子标题样式')
-            .setDesc('记录中各区块标题的显示格式（两种格式均可正常解析）')
+            .setDesc('记录中各区块标题的显示格式')
             .addDropdown(dropdown => dropdown
-                .addOption(SubHeadingStyle.BOLD, '**加粗格式**')
+                .addOption(SubHeadingStyle.BOLD, '> **引用加粗格式**')
                 .addOption(SubHeadingStyle.HEADING, '### 标题格式')
                 .setValue(this.plugin.settings.subHeadingStyle)
                 .onChange(async (value) => {

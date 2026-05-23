@@ -330,7 +330,7 @@ export class MovieLogView extends ItemView {
 
 function normalizeSectionHeaders(block: string): string {
     return block.replace(
-        /^\*\*(电影信息|本季信息|我的观看记录|观后感|本季观感)\*\*$/gm,
+        /^(?:> )?\*\*(电影信息|本季信息|我的观看记录|观后感|本季观感)\*\*$/gm,
         '### $1'
     );
 }

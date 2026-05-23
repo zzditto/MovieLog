@@ -30,7 +30,7 @@ export function generateMovieRecord(
         'dropped': '已弃剧'
     };
 
-    const h = (title: string) => settings.subHeadingStyle === SubHeadingStyle.BOLD ? `**${title}**` : `### ${title}`;
+    const h = (title: string) => settings.subHeadingStyle === SubHeadingStyle.BOLD ? `> **${title}**` : `### ${title}`;
 
     return `## 🎬 ${movie.title}
 
@@ -88,7 +88,7 @@ export function generateTVRecord(
         'dropped': '已弃剧'
     };
 
-    const h = (title: string) => settings.subHeadingStyle === SubHeadingStyle.BOLD ? `**${title}**` : `### ${title}`;
+    const h = (title: string) => settings.subHeadingStyle === SubHeadingStyle.BOLD ? `> **${title}**` : `### ${title}`;
 
     return `## 📺 ${show.name} - ${season.name}
 
