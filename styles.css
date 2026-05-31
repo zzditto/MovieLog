@@ -589,6 +589,9 @@
 }
 
 /* ===== Responsive ===== */
+.movielog-vertical-layout .movielog-year-filter {
+    display: none;
+}
 .movielog-vertical-layout .movielog-poster-card {
     flex-direction: column;
 }
