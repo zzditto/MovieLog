@@ -267,6 +267,15 @@
 .movielog-poster-header {
     padding: 16px 16px 0;
     margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.movielog-header-left {
+    flex: 1;
+    min-width: 0;
 }
 
 .movielog-stats-title {
@@ -607,4 +616,28 @@
 /* ===== Settings ===== */
 .setting-item-info .setting-item-description {
     font-size: 12px;
+}
+
+/* ===== Year Filter ===== */
+.movielog-year-filter select {
+    background: #faf8f5;
+    border: 1.5px solid #d9cdc0;
+    border-radius: 8px;
+    padding: 6px 28px 6px 10px;
+    font-size: 13px;
+    color: #3d3229;
+    cursor: pointer;
+    font-family: inherit;
+    appearance: auto;
+    flex-shrink: 0;
+}
+
+.movielog-year-filter select:hover {
+    border-color: #c4a88c;
+}
+
+.movielog-year-filter select:focus {
+    outline: none;
+    border-color: #a08060;
+    box-shadow: 0 0 0 2px rgba(160, 128, 96, 0.15);
 }
