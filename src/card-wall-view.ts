@@ -30,6 +30,8 @@ const COLOR_THEMES = ['pink', 'blue', 'green', 'peach'];
 export class MovieLogView extends ItemView {
     private settings: PluginSettings;
     private resizeObserver: ResizeObserver | null = null;
+    private allRecords: ParsedRecord[] = [];
+    private selectedYear: string | null = null;
     private static readonly BREAKPOINT = 580;
 
     constructor(leaf: WorkspaceLeaf, settings: PluginSettings) {
@@ -65,35 +67,78 @@ export class MovieLogView extends ItemView {
     async refreshCards(): Promise<void> {
         const container = this.containerEl.children[1] as HTMLElement | undefined;
         if (!container) return;
-        container.empty();
+        this.selectedYear = null;
         await this.renderCards(container);
     }
 
     private async renderCards(container: HTMLElement): Promise<void> {
-        const records = await this.parseAllYearFiles();
+        this.allRecords = await this.parseAllYearFiles();
+        this.renderFilteredView(container);
+    }
 
-        if (records.length === 0) {
+    private renderFilteredView(container: HTMLElement): void {
+        container.empty();
+
+        const filtered = this.selectedYear
+            ? this.allRecords.filter(r => r.year === this.selectedYear)
+            : this.allRecords;
+
+        if (filtered.length === 0) {
             const emptyState = container.createDiv({ cls: 'movielog-empty-state' });
             emptyState.createEl('p', { text: '还没有观影记录' });
             emptyState.createEl('p', { text: '使用命令面板添加你的第一部电影或剧集！' });
             return;
         }
 
-        this.sortRecords(records);
+        this.sortRecords(filtered);
 
-        const totalMovies = records.filter(r => r.type === 'movie').length;
-        const totalTvShows = records.filter(r => r.type === 'tv').length;
+        const totalMovies = filtered.filter(r => r.type === 'movie').length;
+        const totalTvShows = filtered.filter(r => r.type === 'tv').length;
 
         const header = container.createDiv({ cls: 'movielog-poster-header' });
-        const yearSet = new Set(records.map(r => r.year).filter(Boolean));
-        const yearText = yearSet.size === 1 ? `${[...yearSet][0]}年` : '';
-        header.createDiv({ cls: 'movielog-stats-title', text: `观影记录${yearText ? `（${yearText}）` : ''}` });
-        header.createDiv({ cls: 'movielog-stats-sub', text: `统计：共 ${records.length} 部作品（电影 ${totalMovies} 部 ｜ 电视剧 ${totalTvShows} 部）` });
+
+        const headerLeft = header.createDiv({ cls: 'movielog-header-left' });
+        headerLeft.createDiv({
+            cls: 'movielog-stats-title',
+            text: this.selectedYear
+                ? `观影记录（${this.selectedYear}年）`
+                : '观影记录'
+        });
+        headerLeft.createDiv({
+            cls: 'movielog-stats-sub',
+            text: `统计：共 ${filtered.length} 部作品（电影 ${totalMovies} 部 ｜ 电视剧 ${totalTvShows} 部）`
+        });
+
+        const yearFilter = header.createDiv({ cls: 'movielog-year-filter' });
+        const select = yearFilter.createEl('select');
+
+        const years = [...new Set(this.allRecords.map(r => r.year).filter(Boolean))].sort((a, b) => b.localeCompare(a));
+
+        select.createEl('option', { text: '全部年份', attr: { value: '' } });
+        if (!this.selectedYear) {
+            (select.options[0] as HTMLOptionElement).selected = true;
+        }
+
+        for (const year of years) {
+            const count = this.allRecords.filter(r => r.year === year).length;
+            const option = select.createEl('option', {
+                text: `${year}（${count}部）`,
+                attr: { value: year }
+            });
+            if (year === this.selectedYear) {
+                option.selected = true;
+            }
+        }
+
+        select.addEventListener('change', () => {
+            this.selectedYear = select.value || null;
+            this.renderFilteredView(container);
+        });
 
         const grid = container.createDiv({ cls: 'movielog-poster-wall' });
 
-        for (let i = 0; i < records.length; i++) {
-            const record = records[i]!;
+        for (let i = 0; i < filtered.length; i++) {
+            const record = filtered[i]!;
             const colorTheme = COLOR_THEMES[i % COLOR_THEMES.length]!;
             this.renderPosterCard(grid, record, colorTheme);
         }
