@@ -16,6 +16,8 @@ An Obsidian plugin for tracking your movie and TV series watching history. Fetch
 
 ![Preview](image.png)
 
+![Preview Animation](image.gif)
+
 ## Installation
 
 ### Method 1: Install from Obsidian Community Plugins (Recommended)
