@@ -302,6 +302,20 @@ export class MovieLogView extends ItemView {
             img.src = record.poster;
             img.loading = 'lazy';
             img.alt = record.title;
+            img.onerror = () => {
+                img.remove();
+                const fallback = imgContainer.createDiv({ cls: 'movielog-poster-card-fallback' });
+                if (record.tmdb_link) {
+                    const link = fallback.createEl('a', {
+                        text: '海报加载失败',
+                        href: record.tmdb_link
+                    });
+                    link.target = '_blank';
+                    fallback.createSpan({ text: '点击查看 TMDB 页面' });
+                } else {
+                    fallback.createSpan({ text: '海报' });
+                }
+            };
         } else {
             card.createDiv({ cls: 'movielog-poster-card-img', text: '海报' });
         }

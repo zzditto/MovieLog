@@ -644,3 +644,28 @@
     border-color: #a08060;
     box-shadow: 0 0 0 2px rgba(160, 128, 96, 0.15);
 }
+
+/* ===== Poster Fallback ===== */
+.movielog-poster-card-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--background-secondary);
+    color: var(--text-muted);
+    font-size: 12px;
+    text-align: center;
+    padding: 8px;
+    gap: 4px;
+}
+
+.movielog-poster-card-fallback a {
+    color: var(--text-accent);
+    text-decoration: none;
+}
+
+.movielog-poster-card-fallback a:hover {
+    text-decoration: underline;
+}
