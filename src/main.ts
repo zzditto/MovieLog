@@ -90,6 +90,7 @@ class AddRecordModal extends Modal {
 
 export default class MovieLogPlugin extends Plugin {
     settings: PluginSettings;
+    private writingPaths = new Set<string>();
 
     async onload() {
         await this.loadSettings();
@@ -126,7 +127,7 @@ export default class MovieLogPlugin extends Plugin {
                             try {
                                 const content = generateMovieRecord(details, this.settings, userInput);
                                 const fileName = generateMovieFileName(details);
-                                const file = await createRecordFile(this.app, content, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'movie');
+                                const file = await createRecordFile(this.app, content, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'movie', this.writingPaths);
                                 await this.app.workspace.openLinkText(file.path, '', true);
                                 new Notice(`已创建: ${file.basename}`);
                             } catch (error) {
@@ -161,7 +162,7 @@ export default class MovieLogPlugin extends Plugin {
                                     try {
                                         const content = generateTVRecord(showDetails, seasonDetails, this.settings, userInput);
                                         const fileName = generateTVFileName(showDetails, seasonNumber);
-                                        const file = await createRecordFile(this.app, content, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'tv');
+                                        const file = await createRecordFile(this.app, content, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'tv', this.writingPaths);
                                         await this.app.workspace.openLinkText(file.path, '', true);
                                         new Notice(`已创建: ${file.basename}`);
                                     } catch (error) {
@@ -182,6 +183,7 @@ export default class MovieLogPlugin extends Plugin {
             this.registerEvent(
                 this.app.vault.on('modify', (file) => {
                     if (file instanceof TFile && file.extension === 'md') {
+                        if (this.writingPaths.has(file.path)) return;
                         const saveFolder = this.settings.defaultSaveFolder.replace(/^\/|\/$/g, '');
                         if (file.path.startsWith(saveFolder + '/')) {
                             this.refreshCardWall();
