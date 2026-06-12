@@ -25,12 +25,18 @@ interface ParsedRecord {
     review: string | null;
 }
 
+interface CacheEntry {
+    mtime: number;
+    records: ParsedRecord[];
+}
+
 const COLOR_THEMES = ['pink', 'blue', 'green', 'peach'];
 
 export class MovieLogView extends ItemView {
     private settings: PluginSettings;
     private resizeObserver: ResizeObserver | null = null;
     private allRecords: ParsedRecord[] = [];
+    private fileCache = new Map<string, CacheEntry>();
     private selectedYear: string | null = null;
     private static readonly BREAKPOINT = 580;
 
@@ -62,6 +68,7 @@ export class MovieLogView extends ItemView {
 
     async onClose(): Promise<void> {
         this.cleanupResizeObserver();
+        this.fileCache.clear();
     }
 
     async refreshCards(): Promise<void> {
@@ -72,7 +79,7 @@ export class MovieLogView extends ItemView {
     }
 
     private async renderCards(container: HTMLElement): Promise<void> {
-        this.allRecords = await this.parseAllYearFiles();
+        this.allRecords = await this.loadAllRecords();
         this.renderFilteredView(container);
     }
 
@@ -144,25 +151,34 @@ export class MovieLogView extends ItemView {
         }
     }
 
-    private async parseAllYearFiles(): Promise<ParsedRecord[]> {
-        const files = this.app.vault.getFiles();
-        const records: ParsedRecord[] = [];
+    private async loadAllRecords(): Promise<ParsedRecord[]> {
         const saveFolder = this.settings.defaultSaveFolder.replace(/^\/|\/$/g, '');
+        const files = this.app.vault.getFiles().filter(f =>
+            f.path.endsWith('.md')
+            && f.path.startsWith(saveFolder + '/')
+            && /^\d{4}$/.test(f.basename)
+        );
 
-        for (const file of files) {
-            if (!file.path.endsWith('.md')) continue;
-            if (!file.path.startsWith(saveFolder + '/')) continue;
-
-            const yearMatch = file.basename.match(/^(\d{4})$/);
-            if (!yearMatch) continue;
-
-            const year = yearMatch[1] ?? '';
-            const content = await this.app.vault.read(file);
-            const parsed = this.parseYearFileContent(content, year);
-            records.push(...parsed);
+        const livePaths = new Set(files.map(f => f.path));
+        for (const path of [...this.fileCache.keys()]) {
+            if (!livePaths.has(path)) {
+                this.fileCache.delete(path);
+            }
         }
 
-        return records;
+        const results = await Promise.all(files.map(async (file) => {
+            const cached = this.fileCache.get(file.path);
+            if (cached && cached.mtime === file.stat.mtime) {
+                return cached.records;
+            }
+            const year = file.basename;
+            const content = await this.app.vault.read(file);
+            const records = this.parseYearFileContent(content, year);
+            this.fileCache.set(file.path, { mtime: file.stat.mtime, records });
+            return records;
+        }));
+
+        return results.flat();
     }
 
     private parseYearFileContent(content: string, year: string): ParsedRecord[] {
