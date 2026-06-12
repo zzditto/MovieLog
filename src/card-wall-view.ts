@@ -37,6 +37,8 @@ export class MovieLogView extends ItemView {
     private resizeObserver: ResizeObserver | null = null;
     private allRecords: ParsedRecord[] = [];
     private fileCache = new Map<string, CacheEntry>();
+    private refreshTimer: number | null = null;
+    private static readonly REFRESH_DEBOUNCE_MS = 300;
     private selectedYear: string | null = null;
     private static readonly BREAKPOINT = 580;
 
@@ -62,25 +64,34 @@ export class MovieLogView extends ItemView {
         if (!container) return;
         container.empty();
 
-        await this.renderCards(container);
+        await this.doRefresh();
         this.setupResizeObserver(container);
     }
 
     async onClose(): Promise<void> {
         this.cleanupResizeObserver();
+        if (this.refreshTimer !== null) {
+            window.clearTimeout(this.refreshTimer);
+            this.refreshTimer = null;
+        }
         this.fileCache.clear();
     }
 
-    async refreshCards(): Promise<void> {
+    private async doRefresh(): Promise<void> {
         const container = this.containerEl.children[1] as HTMLElement | undefined;
         if (!container) return;
-        this.selectedYear = null;
-        await this.renderCards(container);
-    }
-
-    private async renderCards(container: HTMLElement): Promise<void> {
         this.allRecords = await this.loadAllRecords();
         this.renderFilteredView(container);
+    }
+
+    refreshCards(): void {
+        if (this.refreshTimer !== null) {
+            window.clearTimeout(this.refreshTimer);
+        }
+        this.refreshTimer = window.setTimeout(() => {
+            this.refreshTimer = null;
+            void this.doRefresh();
+        }, MovieLogView.REFRESH_DEBOUNCE_MS);
     }
 
     private renderFilteredView(container: HTMLElement): void {
