@@ -129,7 +129,8 @@ export async function appendToYearFile(
     content: string,
     folder: string,
     watchDate: string | null,
-    contentType: 'movie' | 'tv'
+    contentType: 'movie' | 'tv',
+    writingPaths: Set<string>
 ): Promise<TFile> {
     const folderPath = folder.replace(/^\/|\/$/g, '');
     const year = watchDate ? watchDate.substring(0, 4) : new Date().getFullYear().toString();
@@ -173,7 +174,12 @@ ${content}
 
     const sortedContent = sortMarkdownRecords(newContent);
 
-    await app.vault.modify(file, sortedContent);
+    try {
+        writingPaths.add(file.path);
+        await app.vault.modify(file, sortedContent);
+    } finally {
+        writingPaths.delete(file.path);
+    }
     return file;
 }
 
@@ -195,10 +201,11 @@ export async function createRecordFile(
     folder: string,
     fileName: string,
     watchDate?: string | null,
-    contentType?: 'movie' | 'tv'
+    contentType?: 'movie' | 'tv',
+    writingPaths?: Set<string>
 ): Promise<TFile> {
     if (watchDate !== undefined && contentType) {
-        return appendToYearFile(app, content, folder, watchDate, contentType);
+        return appendToYearFile(app, content, folder, watchDate, contentType, writingPaths ?? new Set());
     }
 
     const folderPath = folder.replace(/^\/|\/$/g, '');
