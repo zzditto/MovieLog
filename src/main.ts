@@ -2,7 +2,7 @@ import { App, Modal, Notice, Plugin, Setting, TFile } from 'obsidian';
 import { PluginSettings, DEFAULT_SETTINGS } from './types';
 import { MovieLogSettingTab } from './settings';
 import { SearchModal } from './search-modal';
-import { getMovieDetails, getTVShowDetails, getSeasonDetails } from './tmdb-api';
+import { getMovieDetails, getTVShowDetails, getSeasonDetails, initTmdbCache, getTmdbCacheForPersist, setTmdbCachePersistCallback, TmdbCacheEntry } from './tmdb-api';
 import {
     generateMovieRecord,
     generateTVRecord,
@@ -103,6 +103,11 @@ export default class MovieLogPlugin extends Plugin {
         });
 
         this.addSettingTab(new MovieLogSettingTab(this.app, this));
+
+        setTmdbCachePersistCallback(() => {
+            const data = { ...this.settings, _tmdbCache: getTmdbCacheForPersist() };
+            this.saveData(data);
+        });
 
         this.addCommand({
             id: 'open-wall',
@@ -231,11 +236,14 @@ export default class MovieLogPlugin extends Plugin {
     }
 
     async loadSettings() {
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+        const data = await this.loadData();
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+        initTmdbCache((data as Record<string, unknown>)._tmdbCache as Record<string, TmdbCacheEntry> || {});
     }
 
     async saveSettings() {
-        await this.saveData(this.settings);
+        const data = { ...this.settings, _tmdbCache: getTmdbCacheForPersist() };
+        await this.saveData(data);
         this.refreshCardWall();
     }
 }
