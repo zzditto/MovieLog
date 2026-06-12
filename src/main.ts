@@ -1,4 +1,4 @@
-import { App, Modal, Notice, Plugin, Setting, TFile } from 'obsidian';
+import { App, Modal, Notice, Plugin, Setting, TFile, requestUrl } from 'obsidian';
 import { PluginSettings, DEFAULT_SETTINGS } from './types';
 import { MovieLogSettingTab } from './settings';
 import { SearchModal } from './search-modal';
@@ -132,8 +132,18 @@ export default class MovieLogPlugin extends Plugin {
                         new AddRecordModal(this.app, async (userInput) => {
                             try {
                                 const content = generateMovieRecord(details, this.settings, userInput);
+                                let finalContent = content;
+                                if (this.settings.posterCacheEnabled && details.poster_path) {
+                                    const localPath = await this.downloadPoster(details.poster_path, details.id);
+                                    if (localPath) {
+                                        finalContent = content.replace(
+                                            /!\[宣传海报\|\d+\]\(https:\/\/image\.tmdb\.org\/[^)]+\)/,
+                                            `![宣传海报|350](${localPath})`
+                                        );
+                                    }
+                                }
                                 const fileName = generateMovieFileName(details);
-                                const file = await createRecordFile(this.app, content, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'movie', this.writingPaths);
+                                const file = await createRecordFile(this.app, finalContent, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'movie', this.writingPaths);
                                 await this.app.workspace.openLinkText(file.path, '', true);
                                 new Notice(`已创建: ${file.basename}`);
                             } catch (error) {
@@ -167,8 +177,21 @@ export default class MovieLogPlugin extends Plugin {
                                 new AddRecordModal(this.app, async (userInput) => {
                                     try {
                                         const content = generateTVRecord(showDetails, seasonDetails, this.settings, userInput);
+                                        let finalContent = content;
+                                        if (this.settings.posterCacheEnabled) {
+                                            const posterPath = seasonDetails.poster_path || showDetails.poster_path;
+                                            if (posterPath) {
+                                                const localPath = await this.downloadPoster(posterPath, showDetails.id);
+                                                if (localPath) {
+                                                    finalContent = content.replace(
+                                                        /!\[宣传海报\|\d+\]\(https:\/\/image\.tmdb\.org\/[^)]+\)/,
+                                                        `![宣传海报|350](${localPath})`
+                                                    );
+                                                }
+                                            }
+                                        }
                                         const fileName = generateTVFileName(showDetails, seasonNumber);
-                                        const file = await createRecordFile(this.app, content, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'tv', this.writingPaths);
+                                        const file = await createRecordFile(this.app, finalContent, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'tv', this.writingPaths);
                                         await this.app.workspace.openLinkText(file.path, '', true);
                                         new Notice(`已创建: ${file.basename}`);
                                     } catch (error) {
@@ -245,5 +268,26 @@ export default class MovieLogPlugin extends Plugin {
         const data = { ...this.settings, _tmdbCache: getTmdbCacheForPersist() };
         await this.saveData(data);
         this.refreshCardWall();
+    }
+
+    private async downloadPoster(posterPath: string, tmdbId: number): Promise<string | null> {
+        const url = `https://image.tmdb.org/t/p/original${posterPath}`;
+        try {
+            const response = await requestUrl({ url });
+            const folderPath = `${this.settings.defaultSaveFolder.replace(/^\/|\/$/g, '')}/_posters`;
+            const fileName = `${tmdbId}.jpg`;
+            const filePath = `${folderPath}/${fileName}`;
+
+            await this.app.vault.createFolder(folderPath).catch(() => {});
+
+            const existing = this.app.vault.getAbstractFileByPath(filePath);
+            if (existing) return filePath;
+
+            await this.app.vault.createBinary(filePath, response.arrayBuffer);
+            return filePath;
+        } catch {
+            reportError('海报下载失败', `tmdb_id=${tmdbId}`);
+            return null;
+        }
     }
 }

@@ -96,5 +96,15 @@ export class MovieLogSettingTab extends PluginSettingTab {
                     this.plugin.settings.subHeadingStyle = value as SubHeadingStyle;
                     await this.plugin.saveSettings();
                 }));
+
+        new Setting(containerEl)
+            .setName('海报本地缓存')
+            .setDesc('启用后将海报图片下载到本地，离线也能查看。默认关闭。')
+            .addToggle(toggle => toggle
+                .setValue(this.plugin.settings.posterCacheEnabled)
+                .onChange(async (value) => {
+                    this.plugin.settings.posterCacheEnabled = value;
+                    await this.plugin.saveSettings();
+                }));
     }
 }

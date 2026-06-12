@@ -49,6 +49,7 @@ export interface PluginSettings {
     defaultSaveFolder: string;
     sortBy: SortBy;
     subHeadingStyle: SubHeadingStyle;
+    posterCacheEnabled: boolean;
 }
 
 export enum WatchStatus {
@@ -140,5 +141,6 @@ export const DEFAULT_SETTINGS: PluginSettings = {
     tmdbLanguage: 'zh-CN',
     defaultSaveFolder: 'MovieLog',
     sortBy: SortBy.WATCH_DATE,
-    subHeadingStyle: SubHeadingStyle.BOLD
+    subHeadingStyle: SubHeadingStyle.BOLD,
+    posterCacheEnabled: false
 };
