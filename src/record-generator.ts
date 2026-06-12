@@ -160,7 +160,7 @@ ${content}
 
     const existingContent = await app.vault.read(file);
     const isMovie = contentType === 'movie';
-    const updatedContent = updateYearFileStats(existingContent, isMovie, 'increment');
+    const updatedContent = updateYearFileStats(existingContent, isMovie);
 
     const insertAfter = `# ${year}年观影记录\n\n`;
     const insertIndex = updatedContent.indexOf(insertAfter);
@@ -183,14 +183,13 @@ ${content}
     return file;
 }
 
-function updateYearFileStats(content: string, isMovie: boolean, action: 'increment' | 'decrement'): string {
+function updateYearFileStats(content: string, isMovie: boolean): string {
     const field = isMovie ? 'total_movies' : 'total_tv_shows';
     const regex = new RegExp(`(${field}:\\s*)(\\d+)`);
     const match = content.match(regex);
     if (match && match[2] !== undefined) {
         const current = parseInt(match[2], 10);
-        const newCount = action === 'increment' ? current + 1 : Math.max(0, current - 1);
-        return content.replace(regex, `$1${newCount}`);
+        return content.replace(regex, `$1${current + 1}`);
     }
     return content;
 }
