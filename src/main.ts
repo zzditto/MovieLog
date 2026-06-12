@@ -12,6 +12,7 @@ import {
     UserRecordInput
 } from './record-generator';
 import { MovieLogView, VIEW_TYPE_MOVIELOG } from './card-wall-view';
+import { reportError } from './utils';
 
 class AddRecordModal extends Modal {
     private result: UserRecordInput;
@@ -131,11 +132,11 @@ export default class MovieLogPlugin extends Plugin {
                                 await this.app.workspace.openLinkText(file.path, '', true);
                                 new Notice(`已创建: ${file.basename}`);
                             } catch (error) {
-                                new Notice(`创建失败: ${error instanceof Error ? error.message : '未知错误'}`);
+                                reportError('创建记录失败', error);
                             }
                         }).open();
                     } catch (error) {
-                        new Notice(`创建失败: ${error instanceof Error ? error.message : '未知错误'}`);
+                        reportError('获取电影详情失败', error);
                     }
                 }).open();
             }
@@ -166,15 +167,15 @@ export default class MovieLogPlugin extends Plugin {
                                         await this.app.workspace.openLinkText(file.path, '', true);
                                         new Notice(`已创建: ${file.basename}`);
                                     } catch (error) {
-                                        new Notice(`创建失败: ${error instanceof Error ? error.message : '未知错误'}`);
+                                        reportError('创建记录失败', error);
                                     }
                                 }).open();
                             } catch (error) {
-                                new Notice(`创建失败: ${error instanceof Error ? error.message : '未知错误'}`);
+                                reportError('获取季详情失败', error);
                             }
                         }).open();
                     } catch (error) {
-                        new Notice(`获取剧集详情失败: ${error instanceof Error ? error.message : '未知错误'}`);
+                        reportError('获取剧集详情失败', error);
                     }
                 }).open();
             }
