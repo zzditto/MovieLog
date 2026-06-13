@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.8.1] - 2026-06-13
+
+### 修复
+
+- 修复 `minAppVersion` 声明为 `0.15.0` 但使用了 `revealLeaf`、`openLinkText` 等较新 API 的问题，升级至 `1.5.0`
+- 修复多处 Promise 未 await 的警告（`activateCardWall`、`saveData`、`revealLeaf`）
+- 修复 async 回调传入期望 void 返回值的参数导致的类型警告
+- 修复 `loadData()` 和 `response.json` 的 unsafe `any` 赋值警告
+- 修复 `setTimeout`/`clearTimeout` 未使用 `window.` 前缀的 popout 窗口兼容性警告
+- ESLint 配置新增 `.opencode/` 忽略规则，消除无关文件误报
+
 ## [0.8.0] - 2026-06-13
 
 ### 新增
