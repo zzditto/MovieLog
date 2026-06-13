@@ -1,6 +1,6 @@
 {
 	"name": "movielog",
-	"version": "0.8.1",
+	"version": "0.8.3",
 	"description": "Log your movie and TV show watching history with TMDB integration",
 	"author": "tinazz",
 	"main": "main.js",
