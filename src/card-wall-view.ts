@@ -1,4 +1,4 @@
-import { ItemView, WorkspaceLeaf } from 'obsidian';
+import { ItemView, WorkspaceLeaf, TFile } from 'obsidian';
 import { PluginSettings, SortBy } from './types';
 
 export const VIEW_TYPE_MOVIELOG = 'movielog-wall';
@@ -84,15 +84,17 @@ export class MovieLogView extends ItemView {
         this.renderFilteredView(container);
     }
 
-    refreshCards(): void {
-        if (this.refreshTimer !== null) {
-            window.clearTimeout(this.refreshTimer);
-        }
-        this.refreshTimer = window.setTimeout(() => {
-            this.refreshTimer = null;
-            void this.doRefresh();
-        }, MovieLogView.REFRESH_DEBOUNCE_MS);
-    }
+	refreshCards(): void {
+		if (this.refreshTimer !== null) {
+			window.clearTimeout(this.refreshTimer);
+		}
+		this.refreshTimer = window.setTimeout(() => {
+			this.refreshTimer = null;
+			this.doRefresh().catch((error) => {
+				console.error('[MovieLog] 刷新卡片墙失败:', error);
+			});
+		}, MovieLogView.REFRESH_DEBOUNCE_MS);
+	}
 
     private renderFilteredView(container: HTMLElement): void {
         container.empty();
@@ -177,17 +179,22 @@ export class MovieLogView extends ItemView {
             }
         }
 
-        const results = await Promise.all(files.map(async (file) => {
-            const cached = this.fileCache.get(file.path);
-            if (cached && cached.mtime === file.stat.mtime) {
-                return cached.records;
-            }
-            const year = file.basename;
-            const content = await this.app.vault.read(file);
-            const records = this.parseYearFileContent(content, year);
-            this.fileCache.set(file.path, { mtime: file.stat.mtime, records });
-            return records;
-        }));
+		const results = await Promise.all(files.map(async (file) => {
+			try {
+				const cached = this.fileCache.get(file.path);
+				if (cached && cached.mtime === file.stat.mtime) {
+					return cached.records;
+				}
+				const year = file.basename;
+				const content = await this.app.vault.read(file);
+				const records = this.parseYearFileContent(content, year);
+				this.fileCache.set(file.path, { mtime: file.stat.mtime, records });
+				return records;
+			} catch (error) {
+				console.error(`[MovieLog] 读取年份文件失败: ${file.path}`, error);
+				return [];
+			}
+		}));
 
         return results.flat();
     }
@@ -296,27 +303,35 @@ export class MovieLogView extends ItemView {
     private renderPosterCard(container: HTMLElement, record: ParsedRecord, colorTheme: string): void {
         const card = container.createDiv({ cls: `movielog-poster-card ${colorTheme}` });
 
-        if (record.poster) {
-            const imgContainer = card.createDiv({ cls: 'movielog-poster-card-img' });
-            const img = imgContainer.createEl('img');
-            img.src = record.poster;
-            img.loading = 'lazy';
-            img.alt = record.title;
-            img.onerror = () => {
-                img.remove();
-                const fallback = imgContainer.createDiv({ cls: 'movielog-poster-card-fallback' });
-                if (record.tmdb_link) {
-                    const link = fallback.createEl('a', {
-                        text: '海报加载失败',
-                        href: record.tmdb_link
-                    });
-                    link.target = '_blank';
-                    fallback.createSpan({ text: '点击查看 TMDB 页面' });
-                } else {
-                    fallback.createSpan({ text: '海报' });
-                }
-            };
-        } else {
+		if (record.poster) {
+			const posterUrl = record.poster.startsWith('http')
+				? record.poster
+				: this.resolveLocalPosterUrl(record.poster);
+			if (posterUrl) {
+				const imgContainer = card.createDiv({ cls: 'movielog-poster-card-img' });
+				const img = imgContainer.createEl('img');
+				img.src = posterUrl;
+				img.loading = 'lazy';
+				img.alt = record.title;
+				img.onerror = () => {
+					console.warn(`[MovieLog] 海报加载失败: ${record.title} (${posterUrl.substring(0, 80)}...)`);
+					img.remove();
+					const fallback = imgContainer.createDiv({ cls: 'movielog-poster-card-fallback' });
+					if (record.tmdb_link) {
+						const link = fallback.createEl('a', {
+							text: '海报加载失败',
+							href: record.tmdb_link
+						});
+						link.target = '_blank';
+						fallback.createSpan({ text: '点击查看 TMDB 页面' });
+					} else {
+						fallback.createSpan({ text: '海报' });
+					}
+				};
+			} else {
+				card.createDiv({ cls: 'movielog-poster-card-img', text: '海报' });
+			}
+		} else {
             card.createDiv({ cls: 'movielog-poster-card-img', text: '海报' });
         }
 
@@ -391,6 +406,15 @@ export class MovieLogView extends ItemView {
         const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
         return '★'.repeat(fullStars) + (halfStar ? '☆' : '') + '☆'.repeat(emptyStars);
     }
+
+	private resolveLocalPosterUrl(posterPath: string): string {
+		const file = this.app.vault.getAbstractFileByPath(posterPath);
+		if (file instanceof TFile) {
+			return this.app.vault.getResourcePath(file);
+		}
+		console.warn(`[MovieLog] 本地海报文件不存在: ${posterPath}`);
+		return '';
+	}
 
     private setupResizeObserver(container: HTMLElement): void {
         this.cleanupResizeObserver();

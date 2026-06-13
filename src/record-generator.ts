@@ -138,9 +138,9 @@ export async function appendToYearFile(
 
     await app.vault.createFolder(folderPath).catch(() => {});
 
-    let file = app.vault.getAbstractFileByPath(filePath);
-    if (!file) {
-        const initialContent = `---
+	let file = app.vault.getAbstractFileByPath(filePath);
+	if (!file) {
+		const initialContent = `---
 year: ${year}
 total_movies: ${contentType === 'movie' ? 1 : 0}
 total_tv_shows: ${contentType === 'tv' ? 1 : 0}
@@ -150,9 +150,14 @@ total_tv_shows: ${contentType === 'tv' ? 1 : 0}
 
 ${content}
 `;
-        const created = await app.vault.create(filePath, initialContent);
-        return created;
-    }
+		try {
+			writingPaths.add(filePath);
+			const created = await app.vault.create(filePath, initialContent);
+			return created;
+		} finally {
+			writingPaths.delete(filePath);
+		}
+	}
 
     if (!(file instanceof TFile)) {
         throw new Error(`路径不是文件: ${filePath}`);

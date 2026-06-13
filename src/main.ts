@@ -144,6 +144,7 @@ export default class MovieLogPlugin extends Plugin {
                                 }
                                 const fileName = generateMovieFileName(details);
                                 const file = await createRecordFile(this.app, finalContent, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'movie', this.writingPaths);
+                                this.refreshCardWall();
                                 await this.app.workspace.openLinkText(file.path, '', true);
                                 new Notice(`已创建: ${file.basename}`);
                             } catch (error) {
@@ -192,6 +193,7 @@ export default class MovieLogPlugin extends Plugin {
                                         }
                                         const fileName = generateTVFileName(showDetails, seasonNumber);
                                         const file = await createRecordFile(this.app, finalContent, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'tv', this.writingPaths);
+                                        this.refreshCardWall();
                                         await this.app.workspace.openLinkText(file.path, '', true);
                                         new Notice(`已创建: ${file.basename}`);
                                     } catch (error) {
@@ -209,12 +211,27 @@ export default class MovieLogPlugin extends Plugin {
             }
         });
         this.app.workspace.onLayoutReady(() => {
+            const isInSaveFolder = (path: string): boolean => {
+                const saveFolder = this.settings.defaultSaveFolder.replace(/^\/|\/$/g, '');
+                return path.startsWith(saveFolder + '/');
+            };
+
             this.registerEvent(
                 this.app.vault.on('modify', (file) => {
                     if (file instanceof TFile && file.extension === 'md') {
                         if (this.writingPaths.has(file.path)) return;
-                        const saveFolder = this.settings.defaultSaveFolder.replace(/^\/|\/$/g, '');
-                        if (file.path.startsWith(saveFolder + '/')) {
+                        if (isInSaveFolder(file.path)) {
+                            this.refreshCardWall();
+                        }
+                    }
+                })
+            );
+
+            this.registerEvent(
+                this.app.vault.on('create', (file) => {
+                    if (file instanceof TFile && file.extension === 'md') {
+                        if (this.writingPaths.has(file.path)) return;
+                        if (isInSaveFolder(file.path)) {
                             this.refreshCardWall();
                         }
                     }

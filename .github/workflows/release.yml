@@ -31,9 +31,26 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG_NAME=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG_NAME#v}
+
+          # Extract changelog section for this version
+          CHANGELOG=$(awk -v ver="$VERSION" '
+            BEGIN { found=0; output="" }
+            /^## \[/ {
+              if (found) exit
+              if (index($0, "[" ver "]") > 0) { found=1; next }
+            }
+            found { output = output $0 "\n" }
+            END { print output }
+          ' CHANGELOG.md)
+
+          if [ -z "$(echo "$CHANGELOG" | tr -d '[:space:]')" ]; then
+            CHANGELOG="Release $TAG_NAME"
+          fi
+
           gh release create "$TAG_NAME" \
             --title "$TAG_NAME" \
-            --generate-notes \
+            --notes "$CHANGELOG" \
             main.js manifest.json styles.css
 
       - name: Upload to release
