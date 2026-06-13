@@ -41,3 +41,49 @@ Source files in `src/`:
 ## Release
 
 Push a git tag → `.github/workflows/release.yml` builds and creates a GitHub release with `main.js`, `manifest.json`, `styles.css`.
+
+### 发布流程
+
+每次发布按以下步骤操作：
+
+1. **确认代码就绪**
+   - `npm run lint` 通过（仅 `src/` 下的错误需关注）
+   - `npm run build` 通过（typecheck + esbuild）
+
+2. **更新 CHANGELOG.md**
+   - 在文件顶部按格式新增版本条目：
+     ```markdown
+     ## [x.y.z] - YYYY-MM-DD
+
+     ### 新增 / 修复 / 优化
+
+     - 变更说明
+     ```
+   - 提交：`git add CHANGELOG.md && git commit -m "docs: 更新 CHANGELOG vx.y.z"`
+
+3. **更新版本号**
+   - 修改 `package.json` 中的 `version` 字段为目标版本
+   - 运行 `npm run version`（自动同步 `manifest.json` 和 `versions.json`）
+   - 提交：`git add package.json manifest.json versions.json && git commit -m "chore: bump version to x.y.z"`
+
+4. **打 tag 并推送**
+   ```bash
+   git tag -a x.y.z -m "x.y.z: 简要说明"
+   git push origin main --tags
+   ```
+
+5. **验证 GitHub Release**
+   - 检查 Actions 是否成功：https://github.com/zzditto/MovieLog/actions
+   - 确认 Release 页面有 `main.js`、`manifest.json`、`styles.css` 三个附件
+   - 确认 Release 说明从 CHANGELOG 正确提取
+
+### 发布故障处理
+
+- **Release 已存在导致 Actions 失败**：先删除 GitHub 上的 Release（Releases → 对应版本 → Edit → Delete release），再删除本地和远程 tag 后重新推送：
+  ```bash
+  git tag -d x.y.z
+  git push origin :refs/tags/x.y.z
+  git tag -a x.y.z -m "x.y.z: 说明"
+  git push origin x.y.z
+  ```
+- **Release 说明为空**：检查 CHANGELOG.md 中版本号格式是否为 `## [x.y.z]`（不带 `v` 前缀），workflow 通过 `[x.y.z]` 匹配
