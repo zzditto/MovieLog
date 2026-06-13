@@ -98,22 +98,22 @@ export default class MovieLogPlugin extends Plugin {
 
         this.registerView(VIEW_TYPE_MOVIELOG, (leaf) => new MovieLogView(leaf, this.settings));
 
-        this.addRibbonIcon('film', 'MovieLog', () => {
-            this.activateCardWall();
-        });
+		this.addRibbonIcon('film', 'MovieLog', () => {
+			void this.activateCardWall();
+		});
 
         this.addSettingTab(new MovieLogSettingTab(this.app, this));
 
-        setTmdbCachePersistCallback(() => {
-            const data = { ...this.settings, _tmdbCache: getTmdbCacheForPersist() };
-            this.saveData(data);
-        });
+		setTmdbCachePersistCallback(() => {
+			const data = { ...this.settings, _tmdbCache: getTmdbCacheForPersist() };
+			void this.saveData(data);
+		});
 
         this.addCommand({
             id: 'open-wall',
             name: '打开卡片墙',
             callback: () => {
-                this.activateCardWall();
+                void this.activateCardWall();
             }
         });
 
@@ -125,35 +125,39 @@ export default class MovieLogPlugin extends Plugin {
                     new Notice('请先在 MovieLog 设置中配置 TMDB API Key');
                     return;
                 }
-                new SearchModal(this.app, this.settings.tmdbApiKey, this.settings.tmdbLanguage, 'movie', async (result) => {
-                    try {
-                        new Notice('正在获取电影详情...');
-                        const details = await getMovieDetails(result.id, this.settings.tmdbApiKey, this.settings.tmdbLanguage);
-                        new AddRecordModal(this.app, async (userInput) => {
-                            try {
-                                const content = generateMovieRecord(details, this.settings, userInput);
-                                let finalContent = content;
-                                if (this.settings.posterCacheEnabled && details.poster_path) {
-                                    const localPath = await this.downloadPoster(details.poster_path, details.id);
-                                    if (localPath) {
-                                        finalContent = content.replace(
-                                            /!\[宣传海报\|\d+\]\(https:\/\/image\.tmdb\.org\/[^)]+\)/,
-                                            `![宣传海报|350](${localPath})`
-                                        );
+                new SearchModal(this.app, this.settings.tmdbApiKey, this.settings.tmdbLanguage, 'movie', (result) => {
+                    void (async () => {
+                        try {
+                            new Notice('正在获取电影详情...');
+                            const details = await getMovieDetails(result.id, this.settings.tmdbApiKey, this.settings.tmdbLanguage);
+                            new AddRecordModal(this.app, (userInput) => {
+                                void (async () => {
+                                    try {
+                                        const content = generateMovieRecord(details, this.settings, userInput);
+                                        let finalContent = content;
+                                        if (this.settings.posterCacheEnabled && details.poster_path) {
+                                            const localPath = await this.downloadPoster(details.poster_path, details.id);
+                                            if (localPath) {
+                                                finalContent = content.replace(
+                                                    /!\[宣传海报\|\d+\]\(https:\/\/image\.tmdb\.org\/[^)]+\)/,
+                                                    `![宣传海报|350](${localPath})`
+                                                );
+                                            }
+                                        }
+                                        const fileName = generateMovieFileName(details);
+                                        const file = await createRecordFile(this.app, finalContent, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'movie', this.writingPaths);
+                                        this.refreshCardWall();
+                                        await this.app.workspace.openLinkText(file.path, '', true);
+                                        new Notice(`已创建: ${file.basename}`);
+                                    } catch (error) {
+                                        reportError('创建记录失败', error);
                                     }
-                                }
-                                const fileName = generateMovieFileName(details);
-                                const file = await createRecordFile(this.app, finalContent, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'movie', this.writingPaths);
-                                this.refreshCardWall();
-                                await this.app.workspace.openLinkText(file.path, '', true);
-                                new Notice(`已创建: ${file.basename}`);
-                            } catch (error) {
-                                reportError('创建记录失败', error);
-                            }
-                        }).open();
-                    } catch (error) {
-                        reportError('获取电影详情失败', error);
-                    }
+                                })();
+                            }).open();
+                        } catch (error) {
+                            reportError('获取电影详情失败', error);
+                        }
+                    })();
                 }).open();
             }
         });
@@ -166,47 +170,53 @@ export default class MovieLogPlugin extends Plugin {
                     new Notice('请先在 MovieLog 设置中配置 TMDB API Key');
                     return;
                 }
-                new SearchModal(this.app, this.settings.tmdbApiKey, this.settings.tmdbLanguage, 'tv', async (result) => {
-                    try {
-                        new Notice('正在获取剧集详情...');
-                        const showDetails = await getTVShowDetails(result.id, this.settings.tmdbApiKey, this.settings.tmdbLanguage);
-                        const { SeasonModal } = await import('./season-modal');
-                        new SeasonModal(this.app, showDetails, async (seasonNumber) => {
-                            try {
-                                new Notice('正在获取季详情...');
-                                const seasonDetails = await getSeasonDetails(showDetails.id, seasonNumber, this.settings.tmdbApiKey, this.settings.tmdbLanguage);
-                                new AddRecordModal(this.app, async (userInput) => {
+                new SearchModal(this.app, this.settings.tmdbApiKey, this.settings.tmdbLanguage, 'tv', (result) => {
+                    void (async () => {
+                        try {
+                            new Notice('正在获取剧集详情...');
+                            const showDetails = await getTVShowDetails(result.id, this.settings.tmdbApiKey, this.settings.tmdbLanguage);
+                            const { SeasonModal } = await import('./season-modal');
+                            new SeasonModal(this.app, showDetails, (seasonNumber) => {
+                                void (async () => {
                                     try {
-                                        const content = generateTVRecord(showDetails, seasonDetails, this.settings, userInput);
-                                        let finalContent = content;
-                                        if (this.settings.posterCacheEnabled) {
-                                            const posterPath = seasonDetails.poster_path || showDetails.poster_path;
-                                            if (posterPath) {
-                                                const localPath = await this.downloadPoster(posterPath, showDetails.id);
-                                                if (localPath) {
-                                                    finalContent = content.replace(
-                                                        /!\[宣传海报\|\d+\]\(https:\/\/image\.tmdb\.org\/[^)]+\)/,
-                                                        `![宣传海报|350](${localPath})`
-                                                    );
+                                        new Notice('正在获取季详情...');
+                                        const seasonDetails = await getSeasonDetails(showDetails.id, seasonNumber, this.settings.tmdbApiKey, this.settings.tmdbLanguage);
+                                        new AddRecordModal(this.app, (userInput) => {
+                                            void (async () => {
+                                                try {
+                                                    const content = generateTVRecord(showDetails, seasonDetails, this.settings, userInput);
+                                                    let finalContent = content;
+                                                    if (this.settings.posterCacheEnabled) {
+                                                        const posterPath = seasonDetails.poster_path || showDetails.poster_path;
+                                                        if (posterPath) {
+                                                            const localPath = await this.downloadPoster(posterPath, showDetails.id);
+                                                            if (localPath) {
+                                                                finalContent = content.replace(
+                                                                    /!\[宣传海报\|\d+\]\(https:\/\/image\.tmdb\.org\/[^)]+\)/,
+                                                                    `![宣传海报|350](${localPath})`
+                                                                );
+                                                            }
+                                                        }
+                                                    }
+                                                    const fileName = generateTVFileName(showDetails, seasonNumber);
+                                                    const file = await createRecordFile(this.app, finalContent, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'tv', this.writingPaths);
+                                                    this.refreshCardWall();
+                                                    await this.app.workspace.openLinkText(file.path, '', true);
+                                                    new Notice(`已创建: ${file.basename}`);
+                                                } catch (error) {
+                                                    reportError('创建记录失败', error);
                                                 }
-                                            }
-                                        }
-                                        const fileName = generateTVFileName(showDetails, seasonNumber);
-                                        const file = await createRecordFile(this.app, finalContent, this.settings.defaultSaveFolder, fileName, userInput.watchDate || null, 'tv', this.writingPaths);
-                                        this.refreshCardWall();
-                                        await this.app.workspace.openLinkText(file.path, '', true);
-                                        new Notice(`已创建: ${file.basename}`);
+                                            })();
+                                        }).open();
                                     } catch (error) {
-                                        reportError('创建记录失败', error);
+                                        reportError('获取季详情失败', error);
                                     }
-                                }).open();
-                            } catch (error) {
-                                reportError('获取季详情失败', error);
-                            }
-                        }).open();
-                    } catch (error) {
-                        reportError('获取剧集详情失败', error);
-                    }
+                                })();
+                            }).open();
+                        } catch (error) {
+                            reportError('获取剧集详情失败', error);
+                        }
+                    })();
                 }).open();
             }
         });
@@ -261,14 +271,14 @@ export default class MovieLogPlugin extends Plugin {
                 leaf.detach();
                 return;
             }
-            workspace.revealLeaf(leaf);
+            await workspace.revealLeaf(leaf);
             return;
         }
 
         const leaf = workspace.getRightLeaf(false);
         if (leaf) {
             await leaf.setViewState({ type: VIEW_TYPE_MOVIELOG, active: true });
-            workspace.revealLeaf(leaf);
+            await workspace.revealLeaf(leaf);
         }
     }
 
@@ -276,9 +286,9 @@ export default class MovieLogPlugin extends Plugin {
     }
 
     async loadSettings() {
-        const data = await this.loadData();
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
-        initTmdbCache((data as Record<string, unknown>)._tmdbCache as Record<string, TmdbCacheEntry> || {});
+        const data = (await this.loadData()) as Record<string, unknown> | null;
+        this.settings = Object.assign({}, DEFAULT_SETTINGS, data ?? {});
+        initTmdbCache((data?._tmdbCache as Record<string, TmdbCacheEntry>) || {});
     }
 
     async saveSettings() {

@@ -65,9 +65,9 @@ export class SearchModal extends Modal {
         };
 
         input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') doSearch();
+            if (e.key === 'Enter') void doSearch();
         });
-        searchBtn.addEventListener('click', doSearch);
+        searchBtn.addEventListener('click', () => void doSearch());
 
         this.resultContainer = contentEl.createDiv({ cls: 'movielog-search-results' });
     }

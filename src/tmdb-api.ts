@@ -20,7 +20,7 @@ export interface TmdbCacheEntry {
 const memoryCache = new Map<string, TmdbCacheEntry>();
 
 let persistCallback: (() => void) | null = null;
-let persistTimer: ReturnType<typeof setTimeout> | null = null;
+let persistTimer: number | null = null;
 
 export function initTmdbCache(data: Record<string, TmdbCacheEntry>): void {
     for (const [key, entry] of Object.entries(data)) {
@@ -42,8 +42,8 @@ export function setTmdbCachePersistCallback(cb: () => void): void {
 
 function schedulePersist(): void {
     if (!persistCallback) return;
-    if (persistTimer !== null) clearTimeout(persistTimer);
-    persistTimer = setTimeout(() => {
+    if (persistTimer !== null) window.clearTimeout(persistTimer);
+    persistTimer = window.setTimeout(() => {
         persistTimer = null;
         persistCallback!();
     }, PERSIST_DEBOUNCE_MS);
@@ -80,7 +80,7 @@ export async function searchMulti(
         throw new Error(`TMDB search failed: ${response.status}`);
     }
 
-    const data: { results?: TMDBSearchResult[] } = response.json;
+    const data = response.json as { results?: TMDBSearchResult[] };
     const results = (data.results || []).filter(
         (item: TMDBSearchResult) => item.media_type === 'movie' || item.media_type === 'tv'
     );
