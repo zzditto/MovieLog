@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.8.3] - 2026-06-13
+
+### 修复
+
+- 修正 `minAppVersion` 从 `1.6.0` 升级至 `1.7.2`，`workspace.revealLeaf()` 返回 `Promise<void>` 是 1.7.2 才引入的 API，修复 `obsidianmd/no-unsupported-api` 报错
+
 ## [0.8.2] - 2026-06-13
 
 ### 修复
