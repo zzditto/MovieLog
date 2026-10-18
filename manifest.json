@@ -5,5 +5,5 @@
 	"description": "Log your movie and TV show watching history with TMDB integration.",
 	"author": "tinazz",
 	"isDesktopOnly": true,
-	"version": "0.8.4"
+	"version": "0.8.5"
 }
