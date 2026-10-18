@@ -32,3 +32,4 @@ docs/
 .codegraph/
 .agents/
 .codex/
+skills-lock.json
