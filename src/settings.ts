@@ -10,6 +10,15 @@ import {
 	ToggleSettingDescriptor
 } from './settings-registry';
 
+/** 设置标签页的分组标题，两种渲染方式共用同一份文案。 */
+const SETTINGS_HEADING = '设置';
+
+/** 一种控件在两种渲染方式下各自的产出：声明式定义与命令式渲染。 */
+interface ControlHandlers {
+	readonly definition: SettingGroupItem;
+	readonly render: (setting: Setting) => void;
+}
+
 export class MovieLogSettingTab extends PluginSettingTab {
 	plugin: MovieLogPlugin;
 
@@ -21,8 +30,8 @@ export class MovieLogSettingTab extends PluginSettingTab {
 	getSettingDefinitions(): SettingDefinitionItem[] {
 		return [{
 			type: 'group',
-			heading: '设置',
-			items: SETTING_DESCRIPTORS.map(descriptor => this.toSettingDefinition(descriptor))
+			heading: SETTINGS_HEADING,
+			items: SETTING_DESCRIPTORS.map(descriptor => this.controlHandlers(descriptor).definition)
 		}];
 	}
 
@@ -38,15 +47,19 @@ export class MovieLogSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		new Setting(containerEl).setName('设置').setHeading();
+		new Setting(containerEl).setName(SETTINGS_HEADING).setHeading();
 
 		for (const descriptor of SETTING_DESCRIPTORS) {
 			const setting = new Setting(containerEl).setName(descriptor.name).setDesc(descriptor.desc);
-			this.renderControl(setting, descriptor);
+			this.controlHandlers(descriptor).render(setting);
 		}
 	}
 
-	private toSettingDefinition(descriptor: SettingDescriptor): SettingGroupItem {
+	/**
+	 * 控件种类到「声明式定义 + 命令式渲染」的唯一分派点。两种渲染方式共用同一份
+	 * 控件描述，新增一种控件只需在这里补一个分支，不会出现只改了一边的情况。
+	 */
+	private controlHandlers(descriptor: SettingDescriptor): ControlHandlers {
 		const base = {
 			name: descriptor.name,
 			desc: descriptor.desc,
@@ -54,59 +67,50 @@ export class MovieLogSettingTab extends PluginSettingTab {
 		};
 
 		switch (descriptor.control) {
-			case 'api-key':
-				return {
-					...base,
-					render: (setting) => this.renderApiKeySetting(setting, descriptor)
-				};
+			case 'api-key': {
+				const render = (setting: Setting) => this.renderApiKeySetting(setting, descriptor);
+				return { definition: { ...base, render }, render };
+			}
 			case 'dropdown':
 				return {
-					...base,
-					control: {
-						type: 'dropdown',
-						key: descriptor.key,
-						options: toOptionRecord(descriptor)
-					}
+					definition: {
+						...base,
+						control: {
+							type: 'dropdown',
+							key: descriptor.key,
+							options: toOptionRecord(descriptor)
+						}
+					},
+					render: setting => this.renderDropdown(setting, descriptor)
 				};
 			case 'toggle':
 				return {
-					...base,
-					control: {
-						type: 'toggle',
-						key: descriptor.key
-					}
+					definition: {
+						...base,
+						control: {
+							type: 'toggle',
+							key: descriptor.key
+						}
+					},
+					render: setting => this.renderToggle(setting, descriptor)
 				};
 			case 'text':
 				return {
-					...base,
-					control: {
-						type: 'text',
-						key: descriptor.key,
-						placeholder: descriptor.placeholder
-					}
+					definition: {
+						...base,
+						control: {
+							type: 'text',
+							key: descriptor.key,
+							placeholder: descriptor.placeholder
+						}
+					},
+					render: setting => this.renderText(setting, descriptor)
 				};
-		}
-	}
-
-	private renderControl(setting: Setting, descriptor: SettingDescriptor): void {
-		switch (descriptor.control) {
-			case 'api-key':
-				this.renderApiKeySetting(setting, descriptor);
-				return;
-			case 'dropdown':
-				this.renderDropdown(setting, descriptor);
-				return;
-			case 'toggle':
-				this.renderToggle(setting, descriptor);
-				return;
-			case 'text':
-				this.renderText(setting, descriptor);
-				return;
 		}
 	}
 
 	private renderText(setting: Setting, descriptor: TextSettingDescriptor): void {
-		const current = descriptor.read(this.plugin.settings) as string;
+		const current = descriptor.read(this.plugin.settings);
 		setting.addText(text => {
 			if (descriptor.placeholder !== undefined) {
 				text.setPlaceholder(descriptor.placeholder);
@@ -120,7 +124,7 @@ export class MovieLogSettingTab extends PluginSettingTab {
 	}
 
 	private renderDropdown(setting: Setting, descriptor: DropdownSettingDescriptor): void {
-		const current = descriptor.read(this.plugin.settings) as string;
+		const current = descriptor.read(this.plugin.settings);
 		setting.addDropdown(dropdown => {
 			for (const option of descriptor.options) {
 				dropdown.addOption(option.value, option.label);
@@ -134,7 +138,7 @@ export class MovieLogSettingTab extends PluginSettingTab {
 	}
 
 	private renderToggle(setting: Setting, descriptor: ToggleSettingDescriptor): void {
-		const current = descriptor.read(this.plugin.settings) as boolean;
+		const current = descriptor.read(this.plugin.settings);
 		setting.addToggle(toggle => toggle
 			.setValue(current)
 			.onChange(async (value) => {
@@ -143,7 +147,7 @@ export class MovieLogSettingTab extends PluginSettingTab {
 	}
 
 	private renderApiKeySetting(setting: Setting, descriptor: ApiKeySettingDescriptor): void {
-		const current = descriptor.read(this.plugin.settings) as string;
+		const current = descriptor.read(this.plugin.settings);
 		setting
 			.addText(text => {
 				if (descriptor.placeholder !== undefined) {
@@ -175,9 +179,5 @@ export class MovieLogSettingTab extends PluginSettingTab {
 }
 
 function toOptionRecord(descriptor: DropdownSettingDescriptor): Record<string, string> {
-	const options: Record<string, string> = {};
-	for (const option of descriptor.options) {
-		options[option.value] = option.label;
-	}
-	return options;
+	return Object.fromEntries(descriptor.options.map(option => [option.value, option.label]));
 }

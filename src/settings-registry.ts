@@ -1,10 +1,15 @@
-import { PluginSettings, SortBy, SubHeadingStyle } from './types';
+import { DEFAULT_SETTINGS, PluginSettings, SortBy, SubHeadingStyle } from './types';
 
 export type SettingsKey = keyof PluginSettings;
 
 /** 取值是普通 `string` 的设置项（不含枚举型设置项）。 */
 type PlainStringSettingKey = {
 	[K in SettingsKey]: string extends PluginSettings[K] ? K : never
+}[SettingsKey];
+
+/** 取值是字符串或字符串枚举的设置项，即下拉控件的全部候选 key。 */
+type StringSettingKey = {
+	[K in SettingsKey]: PluginSettings[K] extends string ? K : never
 }[SettingsKey];
 
 type BooleanSettingKey = {
@@ -17,25 +22,27 @@ export interface SettingOption<V extends string = string> {
 	readonly label: string;
 }
 
-interface SettingDescriptorBase {
+interface SettingDescriptorBase<Value> {
 	readonly key: SettingsKey;
 	readonly name: string;
 	readonly desc: string;
 	readonly aliases: readonly string[];
-	/** 读取设置对象中该设置项的当前值。 */
-	read(settings: PluginSettings): unknown;
+	/** 读取设置对象中该设置项的当前值。返回类型由控件种类收窄。 */
+	read(settings: PluginSettings): Value;
 	/** 写入成功返回 true；未知取值或类型不符时返回 false 且不修改设置。 */
 	write(settings: PluginSettings, raw: unknown): boolean;
 }
 
-export interface TextSettingDescriptor<K extends SettingsKey = SettingsKey> extends SettingDescriptorBase {
+export interface TextSettingDescriptor<K extends SettingsKey = SettingsKey>
+	extends SettingDescriptorBase<string> {
 	readonly key: K;
 	readonly control: 'text';
 	readonly placeholder?: string;
 	readonly normalise: (raw: string) => PluginSettings[K];
 }
 
-export interface ApiKeySettingDescriptor<K extends SettingsKey = SettingsKey> extends SettingDescriptorBase {
+export interface ApiKeySettingDescriptor<K extends SettingsKey = SettingsKey>
+	extends SettingDescriptorBase<string> {
 	readonly key: K;
 	readonly control: 'api-key';
 	readonly placeholder?: string;
@@ -45,13 +52,14 @@ export interface ApiKeySettingDescriptor<K extends SettingsKey = SettingsKey> ex
 export interface DropdownSettingDescriptor<
 	K extends SettingsKey = SettingsKey,
 	V extends string = string
-> extends SettingDescriptorBase {
+> extends SettingDescriptorBase<string> {
 	readonly key: K;
 	readonly control: 'dropdown';
 	readonly options: readonly SettingOption<V>[];
 }
 
-export interface ToggleSettingDescriptor<K extends SettingsKey = SettingsKey> extends SettingDescriptorBase {
+export interface ToggleSettingDescriptor<K extends SettingsKey = SettingsKey>
+	extends SettingDescriptorBase<boolean> {
 	readonly key: K;
 	readonly control: 'toggle';
 }
@@ -71,6 +79,7 @@ interface TextLikeConfig<K extends SettingsKey> {
 	readonly normalise: (raw: string) => PluginSettings[K];
 }
 
+/** 文本输入与 API key 只差标签页的渲染方式，读写行为一致，因此共用同一个工厂。 */
 function createTextSetting(
 	control: 'text' | 'api-key',
 	config: TextLikeConfig<PlainStringSettingKey>
@@ -103,7 +112,7 @@ function apiKeySetting(config: TextLikeConfig<PlainStringSettingKey>): ApiKeySet
 	return createTextSetting('api-key', config) as ApiKeySettingDescriptor;
 }
 
-function dropdownSetting<K extends SettingsKey, V extends PluginSettings[K] & string>(config: {
+function dropdownSetting<K extends StringSettingKey, V extends PluginSettings[K] & string>(config: {
 	readonly key: K;
 	readonly name: string;
 	readonly desc: string;
@@ -155,7 +164,7 @@ function toggleSetting(config: {
 	};
 }
 
-export const TMDB_LANGUAGE_OPTIONS: readonly SettingOption[] = [
+const TMDB_LANGUAGE_OPTIONS: readonly SettingOption[] = [
 	{ value: 'zh-CN', label: '简体中文' },
 	{ value: 'zh-TW', label: '繁體中文' },
 	{ value: 'en-US', label: 'English' },
@@ -163,19 +172,17 @@ export const TMDB_LANGUAGE_OPTIONS: readonly SettingOption[] = [
 	{ value: 'ko-KR', label: '한국어' }
 ];
 
-export const SORT_BY_OPTIONS: readonly SettingOption<SortBy>[] = [
+const SORT_BY_OPTIONS: readonly SettingOption<SortBy>[] = [
 	{ value: SortBy.WATCH_DATE, label: '观看日期' },
 	{ value: SortBy.TITLE, label: '标题' },
 	{ value: SortBy.RATING, label: '评分' },
 	{ value: SortBy.RELEASE_DATE, label: '上映日期' }
 ];
 
-export const SUB_HEADING_STYLE_OPTIONS: readonly SettingOption<SubHeadingStyle>[] = [
+const SUB_HEADING_STYLE_OPTIONS: readonly SettingOption<SubHeadingStyle>[] = [
 	{ value: SubHeadingStyle.BOLD, label: '> **引用加粗格式**' },
 	{ value: SubHeadingStyle.HEADING, label: '### 标题格式' }
 ];
-
-export const DEFAULT_SAVE_FOLDER = 'MovieLog';
 
 export const SETTING_DESCRIPTORS: readonly SettingDescriptor[] = [
 	apiKeySetting({
@@ -190,8 +197,8 @@ export const SETTING_DESCRIPTORS: readonly SettingDescriptor[] = [
 		key: 'defaultSaveFolder',
 		name: '默认保存文件夹',
 		desc: '新记录保存到的文件夹路径',
-		placeholder: DEFAULT_SAVE_FOLDER,
-		normalise: raw => raw.trim() || DEFAULT_SAVE_FOLDER
+		placeholder: DEFAULT_SETTINGS.defaultSaveFolder,
+		normalise: raw => raw.trim() || DEFAULT_SETTINGS.defaultSaveFolder
 	}),
 	dropdownSetting({
 		key: 'tmdbLanguage',
@@ -218,16 +225,11 @@ export const SETTING_DESCRIPTORS: readonly SettingDescriptor[] = [
 	})
 ];
 
-export const SETTING_KEYS: readonly SettingsKey[] = SETTING_DESCRIPTORS.map(descriptor => descriptor.key);
-
-export function findSettingDescriptor(key: string): SettingDescriptor | undefined {
+function findSettingDescriptor(key: string): SettingDescriptor | undefined {
 	return SETTING_DESCRIPTORS.find(descriptor => descriptor.key === key);
 }
 
-/**
- * 把控件上报的值写入设置对象。未知的设置项、类型不符、或不在声明选项内的取值
- * 都不会写入，并返回 false。
- */
+/** 写入控件上报的值；未知设置项、类型不符、或不在声明选项内的取值都不写入并返回 false。 */
 export function applySettingValue(settings: PluginSettings, key: string, raw: unknown): boolean {
 	const descriptor = findSettingDescriptor(key);
 	if (!descriptor) return false;
