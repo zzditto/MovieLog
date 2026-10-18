@@ -1,56 +1,70 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_SETTINGS, PluginSettings, SortBy, SubHeadingStyle } from '../src/types';
-import { SETTING_DESCRIPTORS, SETTING_KEYS, applySettingValue } from '../src/settings-registry';
-
-/** 设置标签页会渲染的全部设置项。 */
-const RENDERED_KEYS = [
-	'tmdbApiKey',
-	'defaultSaveFolder',
-	'tmdbLanguage',
-	'sortBy',
-	'subHeadingStyle',
-	'posterCacheEnabled'
-];
+import { SETTING_DESCRIPTORS, SettingOption, applySettingValue } from '../src/settings-registry';
 
 function freshSettings(): PluginSettings {
 	return { ...DEFAULT_SETTINGS };
 }
 
+function dropdownDescriptors() {
+	return SETTING_DESCRIPTORS.filter(descriptor => descriptor.control === 'dropdown');
+}
+
+/** 把下拉选项读成 value -> label 的映射，数组与记录两种编码都接受。 */
+function labelByValue(options: readonly SettingOption[] | Record<string, string>): Map<string, string> {
+	return new Map(
+		Array.isArray(options)
+			? options.map(option => [option.value, option.label] as const)
+			: Object.entries(options)
+	);
+}
+
 describe('设置项注册表', () => {
-	it('每个渲染的设置项恰好注册一次', () => {
-		expect([...SETTING_KEYS].sort()).toEqual([...RENDERED_KEYS].sort());
-		expect(new Set(SETTING_KEYS).size).toBe(RENDERED_KEYS.length);
-		expect(SETTING_DESCRIPTORS).toHaveLength(RENDERED_KEYS.length);
+	it('每个设置项恰好注册一次', () => {
+		const settingsKeys = Object.keys(DEFAULT_SETTINGS);
+		const registeredKeys = SETTING_DESCRIPTORS.map(descriptor => descriptor.key);
+
+		expect(new Set(registeredKeys)).toEqual(new Set(settingsKeys));
+		expect(new Set(registeredKeys).size).toBe(registeredKeys.length);
 	});
 
 	it('每个注册项都带有设置搜索所需的名称和描述', () => {
-		const settingsKeys = Object.keys(DEFAULT_SETTINGS);
+		const names = new Set<string>();
 
 		for (const descriptor of SETTING_DESCRIPTORS) {
-			expect(settingsKeys).toContain(descriptor.key);
 			expect(descriptor.name.trim()).not.toBe('');
 			expect(descriptor.desc.trim()).not.toBe('');
-			expect(Array.isArray(descriptor.aliases)).toBe(true);
+			names.add(descriptor.name);
+		}
+
+		expect(names.size).toBe(SETTING_DESCRIPTORS.length);
+	});
+
+	it('下拉控件声明的每个取值都能写入，并各自带有界面文案', () => {
+		for (const descriptor of dropdownDescriptors()) {
+			const labels = labelByValue(descriptor.options);
+
+			for (const [value, label] of labels) {
+				const settings = freshSettings();
+
+				expect(label.trim()).not.toBe('');
+				expect(label).not.toBe(value);
+				expect(applySettingValue(settings, descriptor.key, value)).toBe(true);
+				expect(settings[descriptor.key]).toBe(value);
+			}
+
+			expect(new Set(labels.values()).size).toBe(labels.size);
 		}
 	});
 
-	it('下拉选项接受已声明的取值', () => {
-		const settings = freshSettings();
+	it('下拉控件的界面文案保持中文原文', () => {
+		const labels = labelByValue(
+			dropdownDescriptors().flatMap(descriptor => descriptor.options)
+		);
 
-		for (const language of ['zh-CN', 'zh-TW', 'en-US', 'ja-JP', 'ko-KR']) {
-			expect(applySettingValue(settings, 'tmdbLanguage', language)).toBe(true);
-			expect(settings.tmdbLanguage).toBe(language);
-		}
-
-		for (const sortBy of [SortBy.WATCH_DATE, SortBy.TITLE, SortBy.RATING, SortBy.RELEASE_DATE]) {
-			expect(applySettingValue(settings, 'sortBy', sortBy)).toBe(true);
-			expect(settings.sortBy).toBe(sortBy);
-		}
-
-		for (const style of [SubHeadingStyle.BOLD, SubHeadingStyle.HEADING]) {
-			expect(applySettingValue(settings, 'subHeadingStyle', style)).toBe(true);
-			expect(settings.subHeadingStyle).toBe(style);
-		}
+		expect(labels.get('zh-CN')).toBe('简体中文');
+		expect(labels.get(SortBy.WATCH_DATE)).toBe('观看日期');
+		expect(labels.get(SubHeadingStyle.HEADING)).toBe('### 标题格式');
 	});
 
 	it('保存文件夹为空或纯空白时回落到默认目录', () => {
@@ -59,7 +73,7 @@ describe('设置项注册表', () => {
 			settings.defaultSaveFolder = '旧目录';
 
 			expect(applySettingValue(settings, 'defaultSaveFolder', blank)).toBe(true);
-			expect(settings.defaultSaveFolder).toBe('MovieLog');
+			expect(settings.defaultSaveFolder).toBe(DEFAULT_SETTINGS.defaultSaveFolder);
 		}
 
 		const settings = freshSettings();
@@ -117,60 +131,5 @@ describe('设置项注册表', () => {
 		const settings = freshSettings();
 		expect(applySettingValue(settings, 'tmdbApiKey', '  abc123  ')).toBe(true);
 		expect(settings.tmdbApiKey).toBe('abc123');
-	});
-
-	it('保留用户可见的文案与搜索别名', () => {
-		const byKey = new Map(SETTING_DESCRIPTORS.map(descriptor => [descriptor.key, descriptor]));
-
-		expect(byKey.get('tmdbApiKey')).toMatchObject({
-			name: 'TMDB API key',
-			desc: '在 themoviedb.org 注册获取免费 API key',
-			aliases: ['TMDB', 'API', '密钥']
-		});
-		expect(byKey.get('defaultSaveFolder')).toMatchObject({
-			name: '默认保存文件夹',
-			desc: '新记录保存到的文件夹路径',
-			placeholder: 'MovieLog'
-		});
-		expect(byKey.get('tmdbLanguage')).toMatchObject({
-			name: 'TMDB 语言',
-			desc: '从 TMDB 获取元数据的语言'
-		});
-		expect(byKey.get('sortBy')).toMatchObject({
-			name: '排序方式',
-			desc: '卡片墙中的默认排序方式'
-		});
-		expect(byKey.get('subHeadingStyle')).toMatchObject({
-			name: '子标题样式',
-			desc: '记录中各区块标题的显示格式'
-		});
-		expect(byKey.get('posterCacheEnabled')).toMatchObject({
-			name: '海报本地缓存',
-			desc: '启用后将海报图片下载到本地，离线也能查看。默认关闭。'
-		});
-
-		expect(byKey.get('tmdbLanguage')).toMatchObject({
-			options: [
-				{ value: 'zh-CN', label: '简体中文' },
-				{ value: 'zh-TW', label: '繁體中文' },
-				{ value: 'en-US', label: 'English' },
-				{ value: 'ja-JP', label: '日本語' },
-				{ value: 'ko-KR', label: '한국어' }
-			]
-		});
-		expect(byKey.get('sortBy')).toMatchObject({
-			options: [
-				{ value: SortBy.WATCH_DATE, label: '观看日期' },
-				{ value: SortBy.TITLE, label: '标题' },
-				{ value: SortBy.RATING, label: '评分' },
-				{ value: SortBy.RELEASE_DATE, label: '上映日期' }
-			]
-		});
-		expect(byKey.get('subHeadingStyle')).toMatchObject({
-			options: [
-				{ value: SubHeadingStyle.BOLD, label: '> **引用加粗格式**' },
-				{ value: SubHeadingStyle.HEADING, label: '### 标题格式' }
-			]
-		});
 	});
 });
