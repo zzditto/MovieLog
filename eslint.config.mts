@@ -12,7 +12,7 @@ export default tseslint.config(
 			parserOptions: {
 				projectService: {
 					allowDefaultProject: [
-						'eslint.config.js',
+						'eslint.config.mts',
 						'manifest.json'
 					]
 				},
@@ -23,10 +23,18 @@ export default tseslint.config(
 	},
 	...obsidianmd.configs.recommended,
 	{
-		// 插件界面以中文为主，英文句首大小写规则会误报中文文案与缩写。
+		// 界面以中文为主。保留品牌/缩写原有大小写，并跳过日期格式占位符，
+		// 避免规则把「TMDB API Key」之类的专有名词误判为大小写错误。
 		rules: {
-			"obsidianmd/ui/sentence-case": "off"
-		}
+			"obsidianmd/ui/sentence-case": [
+				"warn",
+				{
+					brands: ["MovieLog", "Netflix", "TMDB"],
+					acronyms: ["TMDB", "API"],
+					ignoreRegex: ["YYYY-MM-DD", "yyyy-MM-dd"],
+				},
+			],
+		},
 	},
 	globalIgnores([
 		"node_modules",

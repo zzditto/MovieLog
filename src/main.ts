@@ -121,7 +121,7 @@ export default class MovieLogPlugin extends Plugin {
             name: '添加电影记录',
             callback: () => {
                 if (!this.settings.tmdbApiKey) {
-                    new Notice('请先在 MovieLog 设置中配置 TMDB API Key');
+                    new Notice('请先在 MovieLog 设置中配置 TMDB API key');
                     return;
                 }
                 new SearchModal(this.app, this.settings.tmdbApiKey, this.settings.tmdbLanguage, 'movie', (result) => {
@@ -168,7 +168,7 @@ export default class MovieLogPlugin extends Plugin {
             name: '添加剧集记录',
             callback: () => {
                 if (!this.settings.tmdbApiKey) {
-                    new Notice('请先在 MovieLog 设置中配置 TMDB API Key');
+                    new Notice('请先在 MovieLog 设置中配置 TMDB API key');
                     return;
                 }
                 new SearchModal(this.app, this.settings.tmdbApiKey, this.settings.tmdbLanguage, 'tv', (result) => {

@@ -99,7 +99,7 @@ export class SearchModal extends Modal {
             const typeIcon = result.media_type === 'movie' ? '🎬' : '📺';
             const year = getYear(result);
             info.createEl('strong', { text: `${typeIcon} ${result.title || result.name} (${year})` });
-            info.createEl('span', { text: `⭐ ${(result.vote_average || 0).toFixed(1)}/10` });
+            info.createSpan({ text: `⭐ ${(result.vote_average || 0).toFixed(1)}/10` });
 
             item.addEventListener('click', () => {
                 this.close();

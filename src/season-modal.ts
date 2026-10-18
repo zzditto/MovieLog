@@ -31,12 +31,12 @@ export class SeasonModal extends Modal {
 
             const info = item.createDiv({ cls: 'movielog-season-info' });
             info.createEl('strong', { text: `第${season.season_number}季: ${season.name}` });
-            info.createEl('span', { text: `${season.episode_count}集` });
+            info.createSpan({ text: `${season.episode_count}集` });
             if (season.vote_average) {
-                info.createEl('span', { text: `⭐ ${season.vote_average.toFixed(1)}` });
+                info.createSpan({ text: `⭐ ${season.vote_average.toFixed(1)}` });
             }
             if (season.air_date) {
-                info.createEl('span', { text: season.air_date.substring(0, 4) });
+                info.createSpan({ text: season.air_date.substring(0, 4) });
             }
 
             item.addEventListener('click', () => {
