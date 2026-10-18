@@ -9,9 +9,16 @@ Obsidian plugin for movie/TV watch tracking with TMDB integration. Single-packag
 - `npm run dev` — esbuild watch mode for development
 - `npm run build` — typecheck (`tsc -noEmit -skipLibCheck`) then esbuild production bundle
 - `npm run lint` — ESLint with `eslint-plugin-obsidianmd` + `typescript-eslint`
+- `npm run audit:types` — typecheck against the review environment (`tsc -p tsconfig.audit.json`), where no `@types/*` packages are visible
 - `npm run version` — bumps `manifest.json` and `versions.json` from `package.json` version
 
-No test framework is configured. Verification = lint + build.
+No test framework is configured. Verification = lint + build + audit:types.
+
+`tsconfig.audit.json` exists because Obsidian's community audit installs **production dependencies
+only**, so no `@types/*` package is present. It extends `./tsconfig.json` and differs only by
+`compilerOptions.types: []`, which makes the declared `lib` the sole source of standard-library
+types — exactly the audit's environment. Run it before publishing: a `no-unsafe-*` warning that
+only appears in the audit means the declared `lib` is too low, not that the code is full of `any`.
 
 ## Architecture
 
@@ -49,6 +56,7 @@ Push a git tag → `.github/workflows/release.yml` builds and creates a GitHub r
 1. **确认代码就绪**
    - `npm run lint` 通过（仅 `src/` 下的错误需关注）
    - `npm run build` 通过（typecheck + esbuild）
+   - `npm run audit:types` 通过（审核环境 typecheck）
 
 2. **更新 CHANGELOG.md**
    - 在文件顶部按格式新增版本条目：
