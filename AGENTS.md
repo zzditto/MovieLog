@@ -87,3 +87,17 @@ Push a git tag → `.github/workflows/release.yml` builds and creates a GitHub r
   git push origin x.y.z
   ```
 - **Release 说明为空**：检查 CHANGELOG.md 中版本号格式是否为 `## [x.y.z]`（不带 `v` 前缀），workflow 通过 `[x.y.z]` 匹配
+
+## Agent skills
+
+### Issue tracker
+
+Issues live as GitHub issues in `zzditto/MovieLog`, managed with the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Five canonical roles, label strings identical to their names (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
