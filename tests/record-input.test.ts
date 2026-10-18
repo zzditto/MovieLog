@@ -4,8 +4,13 @@ import { formatLocalDate, validateRecordForm } from '../src/record-input';
 
 describe('观影记录表单', () => {
 	it('按本地时间格式化日期', () => {
-		const date = new Date(2026, 6, 28, 0, 30);
-		expect(formatLocalDate(date)).toBe('2026-07-28');
+		expect(formatLocalDate(new Date(2026, 6, 28, 0, 30))).toBe('2026-07-28');
+	});
+
+	it('月份和日期都是一位数时补零', () => {
+		expect(formatLocalDate(new Date(2026, 0, 5))).toBe('2026-01-05');
+		expect(formatLocalDate(new Date(2026, 8, 9))).toBe('2026-09-09');
+		expect(formatLocalDate(new Date(2026, 11, 31))).toBe('2026-12-31');
 	});
 
 	it('接受闰日和 0 分评分', () => {

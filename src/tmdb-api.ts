@@ -23,10 +23,7 @@ export function initTmdbCache(data: Record<string, TmdbCacheEntry>): void {
 }
 
 export function getTmdbCacheForPersist(): Record<string, TmdbCacheEntry> {
-	const entries: Record<string, unknown> = {};
-	memoryCache.forEach((entry, key) => {
-		entries[key] = entry;
-	});
+	const entries: Record<string, unknown> = Object.fromEntries(memoryCache);
 	const result = pruneTmdbCacheEntries(entries);
 	replaceMemoryCache(result);
 	return result;

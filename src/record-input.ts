@@ -20,13 +20,9 @@ export type RecordFormValidation =
 
 export function formatLocalDate(date: Date = new Date()): string {
 	const year = date.getFullYear();
-	const month = padDatePart(date.getMonth() + 1);
-	const day = padDatePart(date.getDate());
+	const month = String(date.getMonth() + 1).padStart(2, '0');
+	const day = String(date.getDate()).padStart(2, '0');
 	return `${year}-${month}-${day}`;
-}
-
-function padDatePart(value: number): string {
-	return value < 10 ? `0${value}` : `${value}`;
 }
 
 export function parseLocalDate(value: string): Date | null {

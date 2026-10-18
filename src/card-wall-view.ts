@@ -177,11 +177,7 @@ export class MovieLogView extends ItemView {
 			}
 		}));
 
-		const records: ParsedRecord[] = [];
-		for (const yearRecords of results) {
-			records.push(...yearRecords);
-		}
-		return records;
+		return results.flat();
     }
 
     private sortRecords(records: ParsedRecord[]): void {
