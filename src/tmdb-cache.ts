@@ -19,18 +19,12 @@ export function pruneTmdbCacheEntries(
 	entries: Record<string, unknown>,
 	now: number = Date.now()
 ): Record<string, TmdbCacheEntry> {
-	const validEntries: Array<[string, TmdbCacheEntry]> = [];
-	for (const key of Object.keys(entries)) {
-		const entry = entries[key];
-		if (isValidCacheEntry(entry, now)) {
-			validEntries.push([key, entry]);
-		}
-	}
-
-	validEntries.sort(([, left], [, right]) => right.timestamp - left.timestamp);
-	const result: Record<string, TmdbCacheEntry> = {};
-	for (const [key, entry] of validEntries.slice(0, CACHE_MAX_ENTRIES)) {
-		result[key] = entry;
-	}
-	return result;
+	return Object.entries(entries)
+		.filter((entry): entry is [string, TmdbCacheEntry] => isValidCacheEntry(entry[1], now))
+		.sort(([, left], [, right]) => right.timestamp - left.timestamp)
+		.slice(0, CACHE_MAX_ENTRIES)
+		.reduce<Record<string, TmdbCacheEntry>>((acc, [key, entry]) => {
+			acc[key] = entry;
+			return acc;
+		}, {});
 }
